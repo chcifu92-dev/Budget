@@ -206,6 +206,7 @@
       <button class="add-btn" onclick="addExpense()">+ Add expense</button>
       <button class="save-btn" onclick="saveSection()">Save expenses</button>
     </div>
+    <div id="exp-totals-card" class="card" style="margin-top:-4px"></div>
   </div>
 
   <!-- CREDIT -->
@@ -446,7 +447,7 @@ function renderAll(){
   document.getElementById('bsub').textContent=(now.getFullYear()===am.year&&now.getMonth()===am.month)?'Current month':'Past month';
   document.getElementById('paid-sum').innerHTML=`<span style="font-weight:500">${paidCnt()} paid</span><br>${f(paidAmt())} of ${f(tExp())}`;
   renderMetrics();renderPie();renderBar();renderCCDash();renderLoanDash();
-  renderInc();renderExp();renderCC();renderLoans();renderGoals();
+  renderInc();renderExp();renderExpTotals();renderCC();renderLoans();renderGoals();
 }
 
 function renderMetrics(){
@@ -623,6 +624,36 @@ function renderExp(){
       </div>
     </div>`).join('');
 }
+function renderExpTotals(){
+  const exps=D().expenses;
+  const total=exps.reduce((s,e)=>s+nv(e.amount),0);
+  const paid=exps.filter(e=>e.paid).reduce((s,e)=>s+nv(e.amount),0);
+  const remaining=total-paid;
+  const paidPct=total>0?Math.round(paid/total*100):0;
+  document.getElementById('exp-totals-card').innerHTML=`
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px">
+      <div style="text-align:center">
+        <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px">Total</div>
+        <div style="font-size:18px;font-weight:700;color:var(--text)">${f(total,2)}</div>
+      </div>
+      <div style="text-align:center">
+        <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px">Paid</div>
+        <div style="font-size:18px;font-weight:700;color:var(--green)">${f(paid,2)}</div>
+      </div>
+      <div style="text-align:center">
+        <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px">Remaining</div>
+        <div style="font-size:18px;font-weight:700;color:${remaining>0?'var(--red)':'var(--green)'}">${f(remaining,2)}</div>
+      </div>
+    </div>
+    <div style="height:10px;background:var(--surface2);border-radius:5px;overflow:hidden">
+      <div style="height:100%;border-radius:5px;background:var(--green);width:${paidPct}%;transition:width .4s"></div>
+    </div>
+    <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:4px">
+      <span>${paidPct}% paid</span>
+      <span>${exps.filter(e=>e.paid).length} of ${exps.length} bills</span>
+    </div>`;
+}
+
 function updExp(i){
   const e=D().expenses[i];
   const items=document.querySelectorAll('.exp-item');
@@ -631,14 +662,16 @@ function updExp(i){
     items[i].querySelector('.exp-type').textContent=e.type;
     items[i].querySelector('.exp-amt').textContent=f(e.amount,2);
   }
+  renderExpTotals();
 }
 function togglePaid(i,v){
   D().expenses[i].paid=v;persist();
   document.getElementById('paid-sum').innerHTML=`<span style="font-weight:500">${paidCnt()} paid</span><br>${f(paidAmt())} of ${f(tExp())}`;
   renderExp();
+  renderExpTotals();
 }
-function addExpense(){D().expenses.push({name:'',type:'Fixed',amount:0,paid:false});renderExp();}
-function delExp(i){D().expenses.splice(i,1);renderExp();}
+function addExpense(){D().expenses.push({name:'',type:'Fixed',amount:0,paid:false});renderExp();renderExpTotals();}
+function delExp(i){D().expenses.splice(i,1);renderExp();renderExpTotals();}
 
 function renderCC(){
   const sorted=[...D().creditCards.map((c,i)=>({...c,_i:i}))].sort((a,b)=>nv(b.balance)-nv(a.balance));
