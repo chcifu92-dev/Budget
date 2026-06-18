@@ -277,8 +277,9 @@ const MN=['January','February','March','April','May','June','July','August','Sep
 const DS=()=>({
   income:[
     {label:'VA',amount:4458},
-    {label:'Cognitus',amount:5069},
-    {label:'Other',amount:0}
+    {label:'IBM',amount:2532},
+    {label:'IBM',amount:2532},
+    {label:'BAH',amount:0}
   ],
   expenses:[
     {name:'House Payment',type:'Fixed',amount:2200,paid:false},
@@ -293,13 +294,13 @@ const DS=()=>({
     {name:'Grocery',type:'Fixed',amount:400,paid:false},
   ],
   creditCards:[
+    {name:'USAA',balance:6300,limit:10000},
+    {name:'Citibank CashCard',balance:5186,limit:5500},
     {name:'Navy Federal Visa',balance:0,limit:20000},
     {name:'Navy Federal Amex',balance:0,limit:20000},
     {name:'Home Depot',balance:0,limit:10350},
-    {name:'USAA',balance:6300,limit:10000},
     {name:'Lowes',balance:0,limit:10000},
     {name:'MilitaryStar',balance:0,limit:7200},
-    {name:'Citibank CashCard',balance:5186,limit:5500},
     {name:'PayPal',balance:0,limit:5250},
     {name:'Apple Card',balance:0,limit:5000},
     {name:'BestBuy',balance:0,limit:5000},
@@ -335,7 +336,7 @@ const f=(v,d=0)=>(v<0?'-$':'$')+Math.abs(v).toLocaleString('en-US',{minimumFract
 const pct=(a,b)=>b>0?Math.round(a/b*100):0;
 
 function init(){
-  try{const r=localStorage.getItem('bgt_v4');if(r)data=JSON.parse(r);}catch(e){}
+  try{const r=localStorage.getItem('bgt_v5');if(r)data=JSON.parse(r);}catch(e){}
   Object.keys(data).forEach(k=>{
     const d=data[k];
     if(d.income&&!Array.isArray(d.income)){
@@ -350,7 +351,7 @@ function init(){
   buildDrop();renderAll();
 }
 
-function persist(){localStorage.setItem('bgt_v4',JSON.stringify(data));}
+function persist(){localStorage.setItem('bgt_v5',JSON.stringify(data));}
 
 function toast(msg){
   const el=document.getElementById('toast');
@@ -632,7 +633,10 @@ function delExp(i){D().expenses.splice(i,1);renderExp();}
 
 // CREDIT CARDS
 function renderCC(){
-  document.getElementById('cc-list').innerHTML=D().creditCards.map((c,i)=>{
+  // Sort by balance highest first, keep original index for edits
+  const sorted=[...D().creditCards.map((c,i)=>({...c,_i:i}))].sort((a,b)=>nv(b.balance)-nv(a.balance));
+  document.getElementById('cc-list').innerHTML=sorted.map((c)=>{
+  const i=c._i;
     const p=pct(nv(c.balance),nv(c.limit));
     const cl=p>=80?'br':p>=30?'ba':'bg';
     return`<div class="list-item">
