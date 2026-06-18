@@ -452,17 +452,17 @@ function renderAll(){
 }
 
 function renderMetrics(){
-  const rem=tRem(),inc=tInc();
+  const inc=tInc();
+  const rem=tRem(); // always income minus ALL expenses+loans
+  const rc=rem<0?'neg':rem<inc*.1?'warn':'pos';
   const unpaidExp=D().expenses.filter(e=>!e.paid).reduce((s,e)=>s+nv(e.amount),0);
   const unpaidLoans=D().loans.filter(l=>!l.paid).reduce((s,l)=>s+nv(l.monthly),0);
   const unpaidTotal=unpaidExp+unpaidLoans;
-  const leftover=inc-unpaidTotal;
-  const rc=leftover<0?'neg':leftover<inc*.1?'warn':'pos';
   document.getElementById('metrics').innerHTML=`
     <div class="metric"><div class="mlabel">Monthly income</div><div class="mval">${f(inc)}</div></div>
     <div class="metric"><div class="mlabel">Still to pay</div><div class="mval">${f(unpaidTotal)}</div></div>
     <div class="metric"><div class="mlabel">Total debt</div><div class="mval neg">${f(tDebt())}</div></div>
-    <div class="metric"><div class="mlabel">Left over</div><div class="mval ${rc}">${f(leftover)}</div></div>`;
+    <div class="metric"><div class="mlabel">Left over</div><div class="mval ${rc}">${f(rem)}</div></div>`;
 }
 
 function setPieMode(mode){
