@@ -152,7 +152,7 @@
   <button class="pencil-btn" id="pencilBtn" onclick="toggleEdit()">✏️</button>
 </header>
 
-<div class="edit-bar" id="editBar">✏️ Edit mode — rename items or delete them. Tap ✏️ again to save.</div>
+<div class="edit-bar" id="editBar">✏️ Edit mode — change any name or amount. Tap ✏️ again to save.</div>
 
 <nav>
   <button class="active" onclick="go('dashboard')">Dashboard</button>
@@ -571,22 +571,21 @@ function renderInc(){
     <div class="inc-row">
       <div class="inc-view">
         <span class="inc-lbl">${inc.label}</span>
-        <div class="awrap" style="flex:1;max-width:160px;margin-left:auto">
-          <span class="ds">$</span>
-          <input type="number" value="${inc.amount||''}" placeholder="0" min="0" inputmode="decimal"
-            style="font-weight:700;font-size:16px;color:var(--accent)"
-            oninput="D().income[${i}].amount=parseFloat(this.value)||0"
-            onblur="persist();renderMetrics();renderPie();renderBar()">
-        </div>
+        <span class="inc-amt">${f(inc.amount)}</span>
       </div>
       <div class="inc-edit">
-        <div style="display:grid;grid-template-columns:1fr auto;gap:8px;align-items:end">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
           <div><div class="flabel">Label</div>
             <input class="finput" type="text" value="${inc.label}" placeholder="Label"
               oninput="D().income[${i}].label=this.value;document.querySelectorAll('.inc-lbl')[${i}].textContent=this.value">
           </div>
-          <button class="del-btn" onclick="delInc(${i})">🗑</button>
+          <div><div class="flabel">Amount</div>
+            <div class="awrap"><span class="ds">$</span>
+            <input type="number" value="${inc.amount||''}" placeholder="0" min="0" inputmode="decimal"
+              oninput="D().income[${i}].amount=parseFloat(this.value)||0;document.querySelectorAll('.inc-amt')[${i}].textContent=f(D().income[${i}].amount)"></div>
+          </div>
         </div>
+        <button class="del-btn" onclick="delInc(${i})">🗑 Remove</button>
       </div>
     </div>`).join('');
 }
@@ -601,16 +600,10 @@ function renderExp(){
         <input class="exp-chk" type="checkbox" ${e.paid?'checked':''} onchange="togglePaid(${i},this.checked)">
         <span class="exp-name">${e.name||'Expense'}</span>
         <span class="exp-type">${e.type}</span>
-        <div class="awrap" style="max-width:110px">
-          <span class="ds">$</span>
-          <input type="number" value="${e.amount||''}" placeholder="0" min="0" inputmode="decimal"
-            style="font-weight:600;font-size:14px;color:var(--accent);text-align:right"
-            oninput="D().expenses[${i}].amount=parseFloat(this.value)||0"
-            onblur="persist();renderExpTotals();renderMetrics();renderPie();renderBar()">
-        </div>
+        <span class="exp-amt">${f(e.amount,2)}</span>
       </div>
       <div class="exp-edit">
-        <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:8px;align-items:end">
+        <div class="exp-edit-grid">
           <div><div class="flabel">Name</div>
             <input class="finput" type="text" value="${e.name||''}" placeholder="Name"
               oninput="D().expenses[${i}].name=this.value;document.querySelectorAll('.exp-name')[${i}].textContent=this.value||'Expense'">
@@ -622,8 +615,13 @@ function renderExp(){
               <option ${e.type==='Variable'?'selected':''}>Variable</option>
             </select>
           </div>
-          <button class="del-btn" onclick="delExp(${i})" style="margin-bottom:0">🗑</button>
         </div>
+        <div style="margin-bottom:8px"><div class="flabel">Amount</div>
+          <div class="awrap"><span class="ds">$</span>
+          <input type="number" value="${e.amount||''}" placeholder="0" min="0" inputmode="decimal"
+            oninput="D().expenses[${i}].amount=parseFloat(this.value)||0;renderExpTotals()"></div>
+        </div>
+        <button class="del-btn" onclick="delExp(${i})">🗑 Remove expense</button>
       </div>
     </div>`).join('');
 }
@@ -676,7 +674,16 @@ function togglePaid(i,v){
 function addExpense(){D().expenses.push({name:'',type:'Fixed',amount:0,paid:false});renderExp();renderExpTotals();}
 function delExp(i){D().expenses.splice(i,1);renderExp();renderExpTotals();}
 
-function updExp(i){renderExpTotals();}
+function updExp(i){
+  const e=D().expenses[i];
+  const items=document.querySelectorAll('.exp-item');
+  if(items[i]){
+    items[i].querySelector('.exp-name').textContent=e.name||'Expense';
+    items[i].querySelector('.exp-type').textContent=e.type;
+    items[i].querySelector('.exp-amt').textContent=f(e.amount,2);
+  }
+  renderExpTotals();
+}
 
 function renderCC(){
   const sorted=[...D().creditCards.map((c,i)=>({...c,_i:i}))].sort((a,b)=>nv(b.balance)-nv(a.balance));
@@ -685,35 +692,30 @@ function renderCC(){
     const p=pct(nv(c.balance),nv(c.limit));
     const cl=p>=30?'br':'bg';
     return`<div class="list-item">
-      <div class="item-view" style="flex-wrap:wrap;gap:6px">
-        <span class="item-name" style="flex:1;min-width:100px">${c.name||'Card'}</span>
-        <span class="badge ${cl}" style="flex-shrink:0">${p}%</span>
-        <div style="display:flex;gap:6px;width:100%;margin-top:2px">
-          <div style="flex:1">
-            <div class="flabel" style="margin-bottom:2px">Balance</div>
-            <div class="awrap"><span class="ds">$</span>
-            <input type="number" value="${c.balance||''}" placeholder="0" min="0" inputmode="decimal"
-              style="font-weight:600;font-size:14px;color:var(--accent)"
-              oninput="D().creditCards[${i}].balance=parseFloat(this.value)||0"
-              onblur="persist();renderCC();renderCCDash();renderMetrics()"></div>
-          </div>
-          <div style="flex:1">
-            <div class="flabel" style="margin-bottom:2px">Limit</div>
-            <div class="awrap"><span class="ds">$</span>
-            <input type="number" value="${c.limit||''}" placeholder="0" min="0" inputmode="decimal"
-              oninput="D().creditCards[${i}].limit=parseFloat(this.value)||0"
-              onblur="persist();renderCC();renderCCDash()"></div>
-          </div>
-        </div>
+      <div class="item-view">
+        <span class="item-name">${c.name||'Card'}</span>
+        <span class="item-sub">${p}% used</span>
+        <span class="item-val">${f(c.balance)}</span>
+        <span class="badge ${cl}">${p}%</span>
       </div>
       <div class="item-edit">
-        <div style="display:grid;grid-template-columns:1fr auto;gap:8px;align-items:end;margin-top:8px;border-top:0.5px solid var(--border);padding-top:8px">
-          <div><div class="flabel">Card name</div>
-            <input class="finput" type="text" value="${c.name||''}" placeholder="Card name"
-              oninput="D().creditCards[${i}].name=this.value;document.querySelectorAll('#cc-list .item-name')[Array.from(document.querySelectorAll('#cc-list .list-item')).indexOf(this.closest('.list-item'))].textContent=this.value">
-          </div>
-          <button class="del-btn" onclick="delCC(${i})">🗑</button>
+        <div style="margin-bottom:8px"><div class="flabel">Card name</div>
+          <input class="finput" type="text" value="${c.name||''}" placeholder="Card name"
+            oninput="D().creditCards[${i}].name=this.value;updCC(${i})">
         </div>
+        <div class="edit-grid-2">
+          <div><div class="flabel">Balance</div>
+            <div class="awrap"><span class="ds">$</span>
+            <input type="number" value="${c.balance||''}" placeholder="0" min="0" inputmode="decimal"
+              oninput="D().creditCards[${i}].balance=parseFloat(this.value)||0;updCC(${i})"></div>
+          </div>
+          <div><div class="flabel">Credit limit</div>
+            <div class="awrap"><span class="ds">$</span>
+            <input type="number" value="${c.limit||''}" placeholder="0" min="0" inputmode="decimal"
+              oninput="D().creditCards[${i}].limit=parseFloat(this.value)||0;updCC(${i})"></div>
+          </div>
+        </div>
+        <button class="del-btn" onclick="delCC(${i})">🗑 Remove card</button>
       </div>
     </div>`;
   }).join('');
@@ -727,42 +729,36 @@ function renderLoans(){
   D().loans.forEach(l=>{if(l.paid===undefined)l.paid=false;});
   document.getElementById('loan-list').innerHTML=D().loans.map((l,i)=>`
     <div class="list-item ${l.paid?'paid-row':''}">
-      <div class="item-view" style="flex-wrap:wrap;gap:6px">
-        <div style="display:flex;align-items:center;gap:8px;width:100%">
-          <input class="exp-chk" type="checkbox" ${l.paid?'checked':''} onchange="toggleLoanPaid(${i},this.checked)">
-          <span class="item-name" style="${l.paid?'text-decoration:line-through;color:var(--muted)':''}">${l.name||'Loan'}</span>
-        </div>
-        <div style="display:flex;gap:6px;width:100%">
-          <div style="flex:1">
-            <div class="flabel" style="margin-bottom:2px">Monthly payment</div>
-            <div class="awrap"><span class="ds">$</span>
-            <input type="number" value="${l.monthly||''}" placeholder="0" min="0" inputmode="decimal"
-              style="font-weight:600;font-size:14px"
-              oninput="D().loans[${i}].monthly=parseFloat(this.value)||0"
-              onblur="persist();renderLoans();renderLoanDash();renderMetrics()"></div>
-          </div>
-          <div style="flex:1">
-            <div class="flabel" style="margin-bottom:2px">Balance owed</div>
-            <div class="awrap"><span class="ds">$</span>
-            <input type="number" value="${l.balance||''}" placeholder="0" min="0" inputmode="decimal"
-              style="font-weight:600;font-size:14px;color:var(--accent)"
-              oninput="D().loans[${i}].balance=parseFloat(this.value)||0"
-              onblur="persist();renderLoans();renderLoanDash();renderMetrics()"></div>
-          </div>
-        </div>
+      <div class="item-view">
+        <input class="exp-chk" type="checkbox" ${l.paid?'checked':''} onchange="toggleLoanPaid(${i},this.checked)">
+        <span class="item-name" style="${l.paid?'text-decoration:line-through;color:var(--muted)':''}">${l.name||'Loan'}</span>
+        <span class="item-sub">${f(l.monthly)}/mo</span>
+        <span class="item-val">${f(l.balance)}</span>
       </div>
       <div class="item-edit">
-        <div style="display:grid;grid-template-columns:1fr auto;gap:8px;align-items:end;margin-top:8px;border-top:0.5px solid var(--border);padding-top:8px">
-          <div><div class="flabel">Loan name</div>
-            <input class="finput" type="text" value="${l.name||''}" placeholder="Loan name"
-              oninput="D().loans[${i}].name=this.value;document.querySelectorAll('#loan-list .item-name')[${i}].textContent=this.value">
-          </div>
-          <button class="del-btn" onclick="delLoan(${i})">🗑</button>
+        <div style="margin-bottom:8px"><div class="flabel">Loan name</div>
+          <input class="finput" type="text" value="${l.name||''}" placeholder="Loan name"
+            oninput="D().loans[${i}].name=this.value;document.querySelectorAll('#loan-list .item-name')[${i}].textContent=this.value">
         </div>
+        <div class="edit-grid-2">
+          <div><div class="flabel">Monthly payment</div>
+            <div class="awrap"><span class="ds">$</span>
+            <input type="number" value="${l.monthly||''}" placeholder="0" min="0" inputmode="decimal"
+              oninput="D().loans[${i}].monthly=parseFloat(this.value)||0"></div>
+          </div>
+          <div><div class="flabel">Balance owed</div>
+            <div class="awrap"><span class="ds">$</span>
+            <input type="number" value="${l.balance||''}" placeholder="0" min="0" inputmode="decimal"
+              oninput="D().loans[${i}].balance=parseFloat(this.value)||0"></div>
+          </div>
+        </div>
+        <button class="del-btn" onclick="delLoan(${i})">🗑 Remove loan</button>
       </div>
     </div>`).join('');
   renderLoanTotals();
 }
+function addLoan(){D().loans.push({name:'',monthly:0,balance:0,paid:false});renderLoans();}
+function delLoan(i){D().loans.splice(i,1);renderLoans();}
 
 function toggleLoanPaid(i, v){
   const l=D().loans[i];
