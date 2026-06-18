@@ -285,7 +285,11 @@ body.em .loan-row,.em .exp-row,.em .inc-row,.em .cc-row,.em .goal-row{outline:no
     <div class="stitle">Bill calendar</div>
     <div class="cal-card">
       <div class="cal-grid" id="cal-grid"></div>
-      <div class="cal-legend"><span style="width:6px;height:6px;border-radius:50%;background:var(--red);display:inline-block"></span>Bill due</div>
+      <div class="cal-legend">
+        <span style="width:6px;height:6px;border-radius:50%;background:#D85A30;display:inline-block"></span> Unpaid
+        <span style="width:6px;height:6px;border-radius:50%;background:#BA7517;display:inline-block;margin-left:8px"></span> Partial
+        <span style="width:6px;height:6px;border-radius:50%;background:#1D9E75;display:inline-block;margin-left:8px"></span> Paid
+      </div>
     </div>
 
     <div class="stitle">Spending breakdown</div>
@@ -771,7 +775,7 @@ function renderExpTotals(){
 
 function togglePaid(i,v){
   D().expenses[i].paid=v;persist();
-  renderExp();renderExpTotals();updateHeader();
+  renderExp();renderExpTotals();updateHeader();renderCalendar();
 }
 function addExpense(){D().expenses.push({name:'',type:'Fixed',amount:0,paid:false});renderExp();renderExpTotals();}
 function delExp(i){D().expenses.splice(i,1);renderExp();renderExpTotals();updateHeader();}
@@ -882,7 +886,7 @@ function toggleLoanPaid(i,v){
   l.paid=v;
   if(v) l.balance=Math.max(0,nv(l.balance)-nv(l.monthly));
   else l.balance=nv(l.balance)+nv(l.monthly);
-  persist();renderLoans();renderLoanDash();renderMetrics();updateHeader();
+  persist();renderLoans();renderLoanDash();renderMetrics();updateHeader();renderCalendar();
   toast(`${l.name} ${v?'payment recorded ✓':'reversed'}`);
 }
 function addLoan(){D().loans.push({name:'',monthly:0,balance:0,paid:false});renderLoans();}
@@ -1035,6 +1039,55 @@ function animRing(target){
 }
 
 // CALENDAR
+function getBillsForDay(day){
+  const bills=[];
+  (D().expenses||[]).forEach(e=>{
+    if(parseInt(e.dueDay)===day) bills.push({name:e.name,amount:e.amount,paid:e.paid,type:'expense'});
+  });
+  (D().loans||[]).forEach(l=>{
+    if(parseInt(l.dueDay)===day) bills.push({name:l.name,amount:l.monthly,paid:l.paid,type:'loan'});
+  });
+  return bills;
+}
+
+function showDayPopup(day){
+  const bills=getBillsForDay(day);
+  if(!bills.length) return;
+  const existing=document.getElementById('cal-popup');
+  if(existing) existing.remove();
+  const popup=document.createElement('div');
+  popup.id='cal-popup';
+  popup.style.cssText=`position:fixed;bottom:calc(70px + env(safe-area-inset-bottom));left:14px;right:14px;background:var(--surface);border-radius:16px;border:0.5px solid var(--border2);z-index:200;overflow:hidden;box-shadow:0 8px 30px rgba(0,0,0,0.15)`;
+  const mn=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  let html=`<div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:0.5px solid var(--border)">
+    <span style="font-size:14px;font-weight:600;color:var(--text)">${mn[am.month]} ${day}</span>
+    <button onclick="document.getElementById('cal-popup').remove()" style="background:var(--surface2);border:none;border-radius:50%;width:26px;height:26px;cursor:pointer;color:var(--muted);font-size:16px;display:flex;align-items:center;justify-content:center;font-family:inherit">×</button>
+  </div>`;
+  bills.forEach(b=>{
+    const icon=b.type==='loan'?'ti-building-bank':'ti-receipt';
+    const color=b.paid?'#1D9E75':'#D85A30';
+    html+=`<div style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:0.5px solid var(--border)">
+      <div style="width:32px;height:32px;border-radius:9px;background:${b.paid?'#E1F5EE':'#FCEBEB'};display:flex;align-items:center;justify-content:center;flex-shrink:0">
+        <i class="ti ${icon}" style="color:${color};font-size:15px" aria-hidden="true"></i>
+      </div>
+      <div style="flex:1"><div style="font-size:13px;font-weight:500;color:var(--text)">${b.name}</div>
+        <div style="font-size:11px;color:var(--muted)">${b.paid?'✓ Paid':'Unpaid'}</div>
+      </div>
+      <div style="font-size:14px;font-weight:600;color:${color}">${f(b.amount,2)}</div>
+    </div>`;
+  });
+  const total=bills.reduce((s,b)=>s+nv(b.amount),0);
+  html+=`<div style="padding:10px 14px;display:flex;justify-content:space-between;align-items:center">
+    <span style="font-size:12px;color:var(--muted)">${bills.length} bill${bills.length>1?'s':''} · ${bills.filter(b=>b.paid).length} paid</span>
+    <span style="font-size:14px;font-weight:600;color:var(--text)">${f(total,2)}</span>
+  </div>`;
+  popup.innerHTML=html;
+  document.body.appendChild(popup);
+  setTimeout(()=>document.addEventListener('click',function closePopup(e){
+    if(!popup.contains(e.target)){popup.remove();document.removeEventListener('click',closePopup);}
+  }),100);
+}
+
 function renderCalendar(){
   const now=new Date();
   const y=am.year,m=am.month;
@@ -1044,9 +1097,18 @@ function renderCalendar(){
   const isCurrentMonth=(now.getFullYear()===y&&now.getMonth()===m);
   const todayDate=isCurrentMonth?now.getDate():-1;
 
-  const billDays=new Set();
-  (D().expenses||[]).forEach(e=>{if(e.dueDay&&e.dueDay>0)billDays.add(parseInt(e.dueDay));});
-  (D().loans||[]).forEach(l=>{if(l.dueDay&&l.dueDay>0)billDays.add(parseInt(l.dueDay));});
+  // Build day→status map: 'paid'=all paid, 'partial'=some paid, 'unpaid'=none paid, null=no bills
+  const dayStatus={};
+  (D().expenses||[]).forEach(e=>{
+    const d=parseInt(e.dueDay);if(!d)return;
+    if(!dayStatus[d])dayStatus[d]={total:0,paid:0};
+    dayStatus[d].total++;if(e.paid)dayStatus[d].paid++;
+  });
+  (D().loans||[]).forEach(l=>{
+    const d=parseInt(l.dueDay);if(!d)return;
+    if(!dayStatus[d])dayStatus[d]={total:0,paid:0};
+    dayStatus[d].total++;if(l.paid)dayStatus[d].paid++;
+  });
 
   const days=['S','M','T','W','T','F','S'];
   let html=days.map(d=>`<div class="cal-hdr">${d}</div>`).join('');
@@ -1057,8 +1119,13 @@ function renderCalendar(){
   }
   for(let d=1;d<=daysInMonth;d++){
     const isToday=d===todayDate;
-    const hasBill=billDays.has(d);
-    html+=`<div class="cal-day ${isToday?'today':''} ${hasBill?'has-bill':''}">${d}</div>`;
+    const st=dayStatus[d];
+    let dot='';
+    if(st){
+      const dotColor=st.paid===st.total?'#1D9E75':st.paid>0?'#BA7517':'#D85A30';
+      dot=`<span style="position:absolute;bottom:2px;left:50%;transform:translateX(-50%);width:5px;height:5px;border-radius:50%;background:${isToday?'rgba(255,255,255,0.9)':dotColor};display:block"></span>`;
+    }
+    html+=`<div class="cal-day ${isToday?'today':''}" style="position:relative;cursor:${st?'pointer':'default'}" ${st?`onclick="showDayPopup(${d})"`:''}>${d}${dot}</div>`;
   }
   const remaining=(7-(firstDay+daysInMonth)%7)%7;
   for(let d=1;d<=remaining&&remaining<7;d++){html+=`<div class="cal-day muted">${d}</div>`;}
