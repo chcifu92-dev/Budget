@@ -317,7 +317,7 @@ const DS=()=>({
     {name:'Capital One 3',balance:0,limit:600},
   ],
   loans:[
-    {name:'SPLASH (Personal)',monthly:679,balance:5538},
+    {name:'SPLASH',monthly:679,balance:5538},
     {name:'Affirm Ring',monthly:301,balance:4221},
   ],
   goals:[
@@ -536,12 +536,21 @@ function renderBar(){
 }
 
 function renderCCDash(){
-  const d=D(),act=d.creditCards.filter(c=>nv(c.balance)>0);
+  const d=D();
+  // sort by balance highest first
+  const sorted=[...d.creditCards].sort((a,b)=>nv(b.balance)-nv(a.balance));
+  const act=sorted.filter(c=>nv(c.balance)>0);
   const tb=tCCBal(),tl=tCCLim();
   let h=`<table class="dtable"><thead><tr><th>Card</th><th>Balance</th><th>Limit</th><th>%</th></tr></thead><tbody>`;
-  act.forEach(c=>{const p=pct(nv(c.balance),nv(c.limit));const cl=p>=80?'br':p>=30?'ba':'bg';h+=`<tr><td>${c.name}</td><td>${f(c.balance)}</td><td>${f(c.limit)}</td><td><span class="badge ${cl}">${p}%</span></td></tr>`;});
+  act.forEach(c=>{
+    const p=pct(nv(c.balance),nv(c.limit));
+    const cl=p>=30?'br':'bg';
+    h+=`<tr><td>${c.name}</td><td>${f(c.balance)}</td><td>${f(c.limit)}</td><td><span class="badge ${cl}">${p}%</span></td></tr>`;
+  });
   if(!act.length)h+=`<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:1rem">No balances!</td></tr>`;
-  h+=`<tr class="trow"><td>Total</td><td>${f(tb)}</td><td>${f(tl)}</td><td>${pct(tb,tl)}%</td></tr></tbody></table>`;
+  const op=pct(tb,tl);
+  const tcl=op>=30?'br':'bg';
+  h+=`<tr class="trow"><td>Total</td><td>${f(tb)}</td><td>${f(tl)}</td><td><span class="badge ${tcl}">${op}%</span></td></tr></tbody></table>`;
   document.getElementById('cc-dash').innerHTML=h;
 }
 
@@ -631,14 +640,12 @@ function togglePaid(i,v){
 function addExpense(){D().expenses.push({name:'',type:'Fixed',amount:0,paid:false});renderExp();}
 function delExp(i){D().expenses.splice(i,1);renderExp();}
 
-// CREDIT CARDS
 function renderCC(){
-  // Sort by balance highest first, keep original index for edits
   const sorted=[...D().creditCards.map((c,i)=>({...c,_i:i}))].sort((a,b)=>nv(b.balance)-nv(a.balance));
   document.getElementById('cc-list').innerHTML=sorted.map((c)=>{
   const i=c._i;
     const p=pct(nv(c.balance),nv(c.limit));
-    const cl=p>=80?'br':p>=30?'ba':'bg';
+    const cl=p>=30?'br':'bg';
     return`<div class="list-item">
       <div class="item-view">
         <span class="item-name">${c.name||'Card'}</span>
@@ -669,16 +676,8 @@ function renderCC(){
   }).join('');
 }
 function updCC(i){
-  const c=D().creditCards[i];
-  const items=document.querySelectorAll('#cc-list .list-item');
-  if(items[i]){
-    const p=pct(nv(c.balance),nv(c.limit));
-    const cl=p>=80?'br':p>=30?'ba':'bg';
-    items[i].querySelector('.item-name').textContent=c.name||'Card';
-    items[i].querySelector('.item-val').textContent=f(c.balance);
-    items[i].querySelector('.item-sub').textContent=p+'% used';
-    const b=items[i].querySelector('.badge');b.textContent=p+'%';b.className=`badge ${cl}`;
-  }
+  // re-render fully so sort order updates
+  renderCC();renderCCDash();
 }
 function addCC(){D().creditCards.push({name:'',balance:0,limit:0});renderCC();}
 function delCC(i){D().creditCards.splice(i,1);renderCC();}
