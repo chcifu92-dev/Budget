@@ -873,6 +873,15 @@ function go(name){
 
 window.f=f;window.D=D;
 
+// Auto-save on any input change anywhere in the app
+document.addEventListener('input', ()=>persist());
+document.addEventListener('change', ()=>persist());
+
+// Save when closing or switching away
+window.addEventListener('beforeunload', ()=>persist());
+window.addEventListener('pagehide', ()=>persist());
+window.addEventListener('visibilitychange', ()=>{ if(document.visibilityState==='hidden') persist(); });
+
 if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));}
 init();
 </script>
