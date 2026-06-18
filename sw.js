@@ -1,5 +1,5 @@
 const CACHE = 'budget-v1';
-const FILES = ['/', '/budget/', '/budget/index.html'];
+const FILES = ['/', '/Budget/', '/Budget/index.html'];
 
 self.addEventListener('install', e => {
   e.waitUntil(
@@ -21,6 +21,6 @@ self.addEventListener('fetch', e => {
       const clone = resp.clone();
       caches.open(CACHE).then(c => c.put(e.request, clone));
       return resp;
-    })).catch(() => caches.match('/budget/index.html'))
+    })).catch(() => caches.match('/Budget/index.html'))
   );
 });
