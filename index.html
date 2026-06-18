@@ -279,8 +279,8 @@ const MN=['January','February','March','April','May','June','July','August','Sep
 const DS=()=>({
   income:[
     {label:'VA',amount:4458},
-    {label:'IBM',amount:2532},
-    {label:'IBM',amount:2532},
+    {label:'IBM (1st)',amount:2532},
+    {label:'IBM (15th)',amount:2532},
     {label:'BAH',amount:0}
   ],
   expenses:[
@@ -405,7 +405,7 @@ function createMonth(){
   const prev=JSON.parse(JSON.stringify(D()));
   prev.expenses.forEach(e=>e.paid=false);
   prev.loans.forEach(l=>l.paid=false);
-  prev.goals.forEach(g=>g.saved=0);
+  // goals carry over with same saved amount
   data[k]=prev;persist();closeModals();
   cur=k;const p=k.replace('budget_','').split('_');am={year:+p[0],month:+p[1]};
   buildDrop();renderAll();toast(`${MN[am.month]} created ✓`);
