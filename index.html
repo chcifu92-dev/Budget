@@ -733,10 +733,9 @@ function renderCC(){
   const sorted=[...D().creditCards.map((c,i)=>({...c,_i:i}))].sort((a,b)=>nv(b.balance)-nv(a.balance));
   document.getElementById('cc-list').innerHTML=sorted.map(c=>{
     const i=c._i,p=pct(nv(c.balance),nv(c.limit)),cl=p>=30?'br':'bg';
+    const ci=getCCIcon(c.name);
     return`<div class="cc-row">
-      <div class="eicon" style="background:${p>=30?'#FCEBEB':'#E1F5EE'}">
-        <i class="ti ti-credit-card" style="color:${p>=30?'#A32D2D':'#0F6E56'}" aria-hidden="true"></i>
-      </div>
+      <div class="eicon" style="background:${ci.bg};font-weight:700;font-size:14px;color:${ci.ic}">${ci.initial}</div>
       <div style="flex:1;min-width:0">
         <div class="cc-name">${c.name||'Card'}</div>
         <div class="pbar" style="margin-top:4px"><div class="pfill" style="width:${p}%;background:${p>=30?'#A32D2D':'#1D9E75'}"></div></div>
@@ -837,6 +836,43 @@ function toggleLoanPaid(i,v){
 function addLoan(){D().loans.push({name:'',monthly:0,balance:0,paid:false});renderLoans();}
 function delLoan(i){D().loans.splice(i,1);renderLoans();renderLoanDash();renderMetrics();}
 
+// Goal icon mapping
+function getGoalIcon(name){
+  const n=(name||'').toLowerCase();
+  if(n.includes('emergency')||n.includes('fund'))return{icon:'ti-first-aid-kit',bg:'#FCEBEB',ic:'#A32D2D'};
+  if(n.includes('vacation')||n.includes('trip')||n.includes('travel')||n.includes('beach'))return{icon:'ti-beach',bg:'#E6F1FB',ic:'#185FA5'};
+  if(n.includes('car')||n.includes('vehicle')||n.includes('auto'))return{icon:'ti-car',bg:'#EAF3DE',ic:'#3B6D11'};
+  if(n.includes('house')||n.includes('home')||n.includes('rent'))return{icon:'ti-home',bg:'#EEEDFE',ic:'#534AB7'};
+  if(n.includes('college')||n.includes('school')||n.includes('education'))return{icon:'ti-school',bg:'#FAEEDA',ic:'#854F0B'};
+  if(n.includes('wedding')||n.includes('ring'))return{icon:'ti-ring',bg:'#FBEAF0',ic:'#993556'};
+  if(n.includes('retire')||n.includes('401'))return{icon:'ti-chart-line',bg:'#E1F5EE',ic:'#0F6E56'};
+  if(n.includes('baby')||n.includes('kid')||n.includes('child'))return{icon:'ti-baby-carriage',bg:'#FBEAF0',ic:'#993556'};
+  return{icon:'ti-piggy-bank',bg:'#EEEDFE',ic:'#534AB7'};
+}
+
+// CC colored initial badge
+function getCCIcon(name){
+  const n=(name||'').toLowerCase();
+  let bg='#EEEDFE',ic='#534AB7';
+  if(n.includes('usaa'))          {bg='#E6F1FB';ic='#185FA5';}
+  else if(n.includes('navy'))     {bg='#EEEDFE';ic='#534AB7';}
+  else if(n.includes('chase'))    {bg='#E6F1FB';ic='#185FA5';}
+  else if(n.includes('citi'))     {bg='#FCEBEB';ic='#A32D2D';}
+  else if(n.includes('apple'))    {bg='#f5f5f5';ic='#444';}
+  else if(n.includes('amex'))     {bg='#E6F1FB';ic:'#185FA5';}
+  else if(n.includes('discover')) {bg='#FAEEDA';ic='#854F0B';}
+  else if(n.includes('capital'))  {bg='#EAF3DE';ic='#3B6D11';}
+  else if(n.includes('bank of'))  {bg='#FCEBEB';ic='#A32D2D';}
+  else if(n.includes('best'))     {bg='#E6F1FB';ic='#185FA5';}
+  else if(n.includes('home depot')){bg='#FAECE7';ic='#993C1D';}
+  else if(n.includes('lowes'))    {bg='#E6F1FB';ic='#185FA5';}
+  else if(n.includes('military')) {bg='#EEEDFE';ic='#534AB7';}
+  else if(n.includes('paypal'))   {bg='#E6F1FB';ic='#185FA5';}
+  else if(n.includes('us bank'))  {bg='#FCEBEB';ic='#A32D2D';}
+  const initial=(name||'?')[0].toUpperCase();
+  return{bg,ic,initial};
+}
+
 // GOALS
 function renderGoals(){
   const d=D();
@@ -844,16 +880,19 @@ function renderGoals(){
   if(!d.goals.length){document.getElementById('goal-list').innerHTML='<div style="text-align:center;padding:1.5rem;color:var(--muted);font-size:14px">No goals yet. Add one below!</div>';return;}
   document.getElementById('goal-list').innerHTML=d.goals.map((g,i)=>{
     const p=g.target>0?Math.min(100,Math.round(nv(g.saved)/nv(g.target)*100)):0;
+    const gi=getGoalIcon(g.name);
     return`<div class="goal-row">
-      <div class="goal-header">
-        <span class="goal-name">${g.name||'Goal'}</span>
-        <span class="goal-pct">${p}%</span>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+        <div class="eicon" style="background:${gi.bg};flex-shrink:0"><i class="ti ${gi.icon}" style="color:${gi.ic}" aria-hidden="true"></i></div>
+        <div style="flex:1;min-width:0">
+          <div class="goal-header" style="margin-bottom:0">
+            <span class="goal-name">${g.name||'Goal'}</span>
+            <span class="goal-pct">${p}%</span>
+          </div>
+          <div class="goal-amounts" style="margin-top:0"><span>${f(g.saved||0)} saved</span><span>Target: ${f(g.target||0)}</span></div>
+        </div>
       </div>
-      <div class="pbar"><div class="pfill" style="width:${p}%;background:var(--accent)"></div></div>
-      <div class="goal-amounts">
-        <span>${f(g.saved||0)} saved</span>
-        <span>Target: ${f(g.target||0)}</span>
-      </div>
+      <div class="pbar"><div class="pfill" style="width:${p}%;background:${gi.ic}"></div></div>
     </div>
     <div class="edit-section">
       <div style="margin-bottom:8px"><div class="flabel">Goal name</div>
