@@ -25,19 +25,24 @@
   }
   body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); font-size: 15px; line-height: 1.5; min-height: 100vh; padding-bottom: env(safe-area-inset-bottom); }
 
-  header { background: var(--header-bg); padding: 0 1rem; padding-top: env(safe-area-inset-top); display: flex; align-items: center; justify-content: space-between; min-height: 56px; position: sticky; top: 0; z-index: 10; gap: 10px; }
-  header h1 { font-size: 17px; font-weight: 600; color: #fff; white-space: nowrap; }
-  .month-select-wrap { display: flex; align-items: center; gap: 8px; }
-  #monthSelect { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); border-radius: 8px; color: #fff; font-size: 13px; padding: 5px 10px; cursor: pointer; font-family: inherit; outline: none; }
+  header { background: var(--header-bg); padding: 0 1rem; padding-top: env(safe-area-inset-top); display: flex; align-items: center; justify-content: space-between; min-height: 56px; position: sticky; top: 0; z-index: 10; gap: 8px; }
+  header h1 { font-size: 17px; font-weight: 600; color: #fff; white-space: nowrap; flex: 1; }
+  .header-right { display: flex; align-items: center; gap: 6px; }
+  #monthSelect { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); border-radius: 8px; color: #fff; font-size: 12px; padding: 5px 8px; cursor: pointer; font-family: inherit; outline: none; max-width: 110px; }
   #monthSelect option { background: #1a4a4a; color: #fff; }
-  .new-month-btn { background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.35); border-radius: 8px; color: #fff; font-size: 12px; padding: 5px 10px; cursor: pointer; white-space: nowrap; font-family: inherit; }
-  .new-month-btn:hover { background: rgba(255,255,255,0.3); }
+  .hdr-btn { background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.35); border-radius: 8px; color: #fff; font-size: 12px; padding: 5px 8px; cursor: pointer; white-space: nowrap; font-family: inherit; }
+  .hdr-btn:active { background: rgba(255,255,255,0.35); }
+  .edit-btn { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); border-radius: 8px; color: #fff; font-size: 18px; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+  .edit-btn.active { background: #fff; color: var(--accent); }
 
   nav { display: flex; background: var(--surface); border-bottom: 0.5px solid var(--border); overflow-x: auto; scrollbar-width: none; }
   nav::-webkit-scrollbar { display: none; }
   nav button { flex: 1; min-width: 60px; padding: 10px 4px; font-size: 12px; border: none; background: none; color: var(--muted); cursor: pointer; border-bottom: 2px solid transparent; white-space: nowrap; font-family: inherit; }
   nav button.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 500; }
-  nav button:hover:not(.active) { color: var(--text); }
+
+  /* Edit mode banner */
+  .edit-banner { display: none; background: #FFF8E6; border-bottom: 1px solid #F5C842; padding: 8px 1rem; font-size: 13px; color: #7A5500; text-align: center; }
+  .edit-banner.show { display: block; }
 
   main { max-width: 660px; margin: 0 auto; padding: 1.25rem 1rem 5rem; }
   .page { display: none; }
@@ -58,6 +63,9 @@
   .card { background: var(--surface); border: 0.5px solid var(--border); border-radius: 14px; padding: 1rem 1.125rem; margin-bottom: 1rem; }
   .card-title { font-size: 11px; font-weight: 500; color: var(--muted); margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 0.04em; }
 
+  /* Edit mode card highlight */
+  body.edit-mode .card { border-color: #F5C842; }
+
   .chart-wrap { position: relative; width: 100%; }
   .legend { display: flex; flex-wrap: wrap; gap: 8px 14px; margin-bottom: 12px; font-size: 12px; color: var(--muted); }
   .legend span { display: flex; align-items: center; gap: 5px; }
@@ -69,8 +77,18 @@
   .data-table tr:last-child td { border-bottom: none; }
   .data-table .total-row td { font-weight: 600; background: var(--surface2); }
 
+  /* Income fields */
+  .income-row { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; background: var(--surface2); border-radius: 10px; padding: 10px 12px; }
+  .income-label { font-size: 13px; color: var(--muted); min-width: 80px; font-weight: 500; }
+  .income-label-input { font-size: 13px; color: var(--text); min-width: 80px; max-width: 100px; background: rgba(255,255,255,0.7); border: 1px solid var(--border2); border-radius: 6px; padding: 3px 6px; font-family: inherit; font-weight: 500; display: none; }
+  body.edit-mode .income-label { display: none; }
+  body.edit-mode .income-label-input { display: block; }
+  .dollar-wrap { display: flex; align-items: center; flex: 1; gap: 4px; }
+  .dollar-sign { font-size: 15px; color: var(--muted); font-weight: 500; }
+
   label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 5px; margin-top: 12px; }
   label:first-child { margin-top: 0; }
+
   input[type="text"], input[type="number"], select {
     width: 100%; background: var(--surface2); border: 0.5px solid var(--border2); border-radius: 8px;
     padding: 9px 12px; font-size: 16px; color: var(--text); font-family: inherit; outline: none;
@@ -78,39 +96,57 @@
   input:focus, select:focus { border-color: var(--accent); }
 
   .save-btn { display: block; width: 100%; margin-top: 14px; background: var(--accent); color: #fff; border: none; border-radius: 10px; padding: 13px; font-size: 16px; font-weight: 500; cursor: pointer; font-family: inherit; }
-  .save-btn:active { opacity: 0.8; transform: scale(0.98); }
+  .save-btn:active { opacity: 0.8; }
 
+  /* Expense rows */
   .exp-list { display: flex; flex-direction: column; gap: 6px; }
-  .exp-item { display: grid; gap: 5px; align-items: center; background: var(--surface2); border-radius: 9px; padding: 10px; }
-  .exp-item.expense-row { grid-template-columns: 1fr 80px 75px 36px 28px; }
-  .exp-item.cc-row { grid-template-columns: 1fr 80px 80px 55px 28px; }
-  .exp-item.loan-row { grid-template-columns: 1fr 80px 80px 28px; }
-  .exp-item input, .exp-item select { background: transparent; border: none; padding: 3px 0; font-size: 14px; border-radius: 0; }
-  .exp-item input:focus, .exp-item select:focus { border-color: transparent; outline: none; }
-  .exp-item .amt { text-align: right; font-weight: 500; }
+  .exp-item { background: var(--surface2); border-radius: 9px; padding: 10px; }
 
-  .del-btn { background: none; border: none; cursor: pointer; color: var(--muted); font-size: 20px; line-height: 1; padding: 4px; border-radius: 4px; display: flex; align-items: center; justify-content: center; }
-  .del-btn:active { color: var(--red); }
+  /* View mode row */
+  .exp-view { display: flex; align-items: center; gap: 8px; }
+  .exp-view-name { flex: 1; font-size: 14px; font-weight: 500; }
+  .exp-view-type { font-size: 11px; color: var(--muted); background: var(--surface); border-radius: 4px; padding: 2px 6px; }
+  .exp-view-amount { font-size: 15px; font-weight: 600; color: var(--accent); min-width: 80px; text-align: right; }
+  .exp-view-paid { width: 20px; height: 20px; accent-color: var(--green); cursor: pointer; }
+  .exp-edit-row { display: none; margin-top: 8px; border-top: 0.5px solid var(--border); padding-top: 8px; }
+  .exp-edit-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  .exp-edit-field label { font-size: 11px; color: var(--muted); text-transform: uppercase; margin-bottom: 3px; margin-top: 0; }
+  .exp-edit-field input, .exp-edit-field select { font-size: 14px; padding: 7px 10px; }
+  .amount-input-wrap { display: flex; align-items: center; background: var(--surface2); border: 0.5px solid var(--border2); border-radius: 8px; overflow: hidden; }
+  .amount-input-wrap .ds { padding: 7px 0 7px 10px; font-size: 14px; color: var(--muted); background: transparent; }
+  .amount-input-wrap input { border: none; border-radius: 0; background: transparent; padding: 7px 10px 7px 4px; }
+  .amount-input-wrap input:focus { outline: none; }
+  .del-exp-btn { display: flex; align-items: center; gap: 4px; background: #fcebeb; border: none; border-radius: 8px; padding: 7px 12px; color: #A32D2D; font-size: 13px; cursor: pointer; font-family: inherit; }
+
+  body.edit-mode .exp-edit-row { display: block; }
+  body.edit-mode .exp-item { border: 0.5px solid #F5C842; }
 
   .add-btn { display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%; margin-top: 8px; padding: 10px; background: none; border: 0.5px dashed var(--border2); border-radius: 9px; color: var(--muted); font-size: 14px; cursor: pointer; font-family: inherit; }
   .add-btn:active { background: var(--surface2); }
 
-  .col-headers { display: grid; gap: 5px; padding: 0 10px; margin-bottom: 3px; }
-  .col-headers.expense-row { grid-template-columns: 1fr 80px 75px 36px 28px; }
-  .col-headers.cc-row { grid-template-columns: 1fr 80px 80px 55px 28px; }
-  .col-headers.loan-row { grid-template-columns: 1fr 80px 80px 28px; }
-  .col-headers span { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.03em; }
+  /* CC / Loan rows */
+  .cc-item, .loan-item { background: var(--surface2); border-radius: 9px; padding: 10px; margin-bottom: 6px; }
+  body.edit-mode .cc-item, body.edit-mode .loan-item { border: 0.5px solid #F5C842; }
 
-  .paid-check { width: 20px; height: 20px; cursor: pointer; accent-color: var(--green); }
-  .paid-row { background: rgba(29,158,117,0.07) !important; }
-  .paid-row .exp-name { text-decoration: line-through; color: var(--muted); }
+  .cc-view { display: flex; align-items: center; gap: 8px; }
+  .cc-view-name { flex: 1; font-size: 14px; font-weight: 500; }
+  .cc-view-bal { font-size: 15px; font-weight: 600; color: var(--accent); }
+  .cc-view-util { font-size: 12px; }
+  .cc-edit { display: none; margin-top: 8px; border-top: 0.5px solid var(--border); padding-top: 8px; }
+  body.edit-mode .cc-edit { display: block; }
+  .cc-edit-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+  .cc-edit-field label { font-size: 11px; color: var(--muted); text-transform: uppercase; margin-bottom: 3px; margin-top: 0; }
+  .cc-edit-field input { font-size: 14px; padding: 7px 10px; }
 
   .badge { display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: 11px; font-weight: 500; }
   .badge-green { background: #e1f5ee; color: #0F6E56; }
   .badge-amber { background: #faeeda; color: #854F0B; }
   .badge-red { background: #fcebeb; color: #A32D2D; }
 
-  .progress-bar { height: 8px; background: var(--surface2); border-radius: 4px; overflow: hidden; }
+  .paid-row .exp-view-name { text-decoration: line-through; color: var(--muted); }
+  .paid-row { background: rgba(29,158,117,0.06) !important; }
+
+  .progress-bar { height: 8px; background: var(--surface); border-radius: 4px; overflow: hidden; }
   .progress-fill { height: 100%; border-radius: 4px; background: var(--green); transition: width 0.4s; }
 
   .toast { position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%) translateY(10px); background: var(--text); color: var(--bg); padding: 10px 22px; border-radius: 20px; font-size: 14px; font-weight: 500; opacity: 0; transition: opacity 0.25s, transform 0.25s; pointer-events: none; z-index: 100; white-space: nowrap; }
@@ -124,23 +160,20 @@
   .modal-btns { display: flex; gap: 8px; }
   .modal-btns button { flex: 1; padding: 12px; border-radius: 10px; font-size: 15px; font-weight: 500; cursor: pointer; font-family: inherit; border: 0.5px solid var(--border2); background: var(--surface2); color: var(--text); }
   .modal-btns .confirm-btn { background: var(--accent); color: #fff; border-color: var(--accent); }
-
-  @media (max-width: 420px) {
-    .exp-item.expense-row { grid-template-columns: 1fr 70px 65px 28px 24px; }
-    .col-headers.expense-row { grid-template-columns: 1fr 70px 65px 28px 24px; }
-    .metric-value { font-size: 18px; }
-  }
 </style>
 </head>
 <body>
 
 <header>
-  <h1>💰 Budget</h1>
-  <div class="month-select-wrap">
+  <h1 id="appTitle">💰 Budget</h1>
+  <div class="header-right">
     <select id="monthSelect" onchange="switchMonth(this.value)"></select>
-    <button class="new-month-btn" onclick="showNewMonthModal()">+ New</button>
+    <button class="hdr-btn" onclick="showNewMonthModal()">+ New</button>
+    <button class="edit-btn" id="editToggleBtn" onclick="toggleEditMode()" title="Edit mode">✏️</button>
   </div>
 </header>
+
+<div class="edit-banner" id="editBanner">✏️ Edit mode — tap any field to rename or update amounts. Hit Save when done.</div>
 
 <nav>
   <button class="active" onclick="switchTab('dashboard')">Dashboard</button>
@@ -152,11 +185,12 @@
 </nav>
 
 <main>
+  <!-- DASHBOARD -->
   <div id="page-dashboard" class="page active">
     <div class="month-banner">
       <div>
         <div class="month-banner-title" id="banner-title">July 2026</div>
-        <div class="month-banner-sub" id="banner-sub">Current month</div>
+        <div class="month-banner-sub" id="banner-sub"></div>
       </div>
       <div id="paid-summary" style="text-align:right;font-size:13px;color:var(--muted)"></div>
     </div>
@@ -180,52 +214,46 @@
     </div>
   </div>
 
+  <!-- INCOME -->
   <div id="page-income" class="page">
     <div class="card">
       <div class="card-title">Monthly income</div>
-      <label>VA</label><input type="number" id="inc-va" placeholder="0" min="0" inputmode="decimal">
-      <label>Cognitus</label><input type="number" id="inc-cognitus" placeholder="0" min="0" inputmode="decimal">
-      <label>Other</label><input type="number" id="inc-other" placeholder="0" min="0" inputmode="decimal">
+      <div id="income-fields"></div>
       <button class="save-btn" onclick="saveIncome()">Save income</button>
     </div>
   </div>
 
+  <!-- EXPENSES -->
   <div id="page-expenses" class="page">
     <div class="card">
       <div class="card-title">Monthly expenses</div>
-      <div class="col-headers expense-row">
-        <span>Name</span><span>Type</span><span>Amount</span><span>Paid</span><span></span>
-      </div>
       <div class="exp-list" id="exp-list"></div>
       <button class="add-btn" onclick="addExpense()">+ Add expense</button>
       <button class="save-btn" onclick="saveExpenses()">Save expenses</button>
     </div>
   </div>
 
+  <!-- CREDIT -->
   <div id="page-credit" class="page">
     <div class="card">
       <div class="card-title">Credit cards</div>
-      <div class="col-headers cc-row">
-        <span>Card</span><span>Balance</span><span>Limit</span><span>% Used</span><span></span>
-      </div>
-      <div class="exp-list" id="cc-list"></div>
+      <div id="cc-list"></div>
       <button class="add-btn" onclick="addCC()">+ Add card</button>
       <button class="save-btn" onclick="saveCreditCards()">Save cards</button>
     </div>
   </div>
 
+  <!-- LOANS -->
   <div id="page-loans" class="page">
     <div class="card">
       <div class="card-title">Loans &amp; Affirm</div>
-      <div class="col-headers loan-row">
-        <span>Loan</span><span>Monthly</span><span>Balance</span><span></span>
-      </div>
-      <div class="exp-list" id="loan-list"></div>
+      <div id="loan-list"></div>
       <button class="add-btn" onclick="addLoan()">+ Add loan</button>
       <button class="save-btn" onclick="saveLoans()">Save loans</button>
     </div>
   </div>
 
+  <!-- GOALS -->
   <div id="page-goals" class="page">
     <div class="card">
       <div class="card-title">Savings goals</div>
@@ -241,7 +269,7 @@
 <div class="modal-backdrop" id="newMonthModal">
   <div class="modal">
     <h2>Start a new month</h2>
-    <p>Copies your income, expenses, and loans from the current month. Paid checkboxes reset to unpaid.</p>
+    <p>Copies your income, expenses, and loans. Paid checkboxes reset to unpaid.</p>
     <div style="margin-bottom:1.25rem">
       <label style="margin-top:0">Select month</label>
       <select id="newMonthSelect" style="width:100%"></select>
@@ -258,7 +286,11 @@ const COLORS=['#534AB7','#1D9E75','#D85A30','#BA7517','#185FA5','#993556','#6399
 const MONTH_NAMES=['January','February','March','April','May','June','July','August','September','October','November','December'];
 
 const DEFAULT_STATE=()=>({
-  income:{va:4458,cognitus:5069,other:0},
+  income:[
+    {label:'VA', amount:4458},
+    {label:'Cognitus', amount:5069},
+    {label:'Other', amount:0}
+  ],
   expenses:[
     {name:'House Payment',type:'Fixed',amount:2200,paid:false},
     {name:'Car Payment',type:'Fixed',amount:565.48,paid:false},
@@ -307,15 +339,33 @@ const DEFAULT_STATE=()=>({
 let currentKey='';
 let data={};
 let activeMonth={year:2026,month:6};
+let editMode=false;
 let pieChart,barChart;
+let settings={appTitle:'💰 Budget'};
 
 function monthKey(y,m){return`budget_${y}_${m}`;}
 function monthLabel(y,m){return`${MONTH_NAMES[m]} ${y}`;}
 
 function loadAll(){
-  try{const r=localStorage.getItem('budgetAllMonths_v3');if(r)data=JSON.parse(r);}catch(e){}
+  try{
+    const r=localStorage.getItem('budgetAllMonths_v3');
+    if(r) data=JSON.parse(r);
+    const s=localStorage.getItem('budgetSettings');
+    if(s) settings=JSON.parse(s);
+  }catch(e){}
   const julyKey=monthKey(2026,6);
   if(!data[julyKey]){data[julyKey]=DEFAULT_STATE();saveAll();}
+  // migrate old income format
+  Object.keys(data).forEach(k=>{
+    const d=data[k];
+    if(d.income && !Array.isArray(d.income)){
+      d.income=[
+        {label:'VA',amount:d.income.va||0},
+        {label:'Cognitus',amount:d.income.cognitus||0},
+        {label:'Other',amount:d.income.other||0}
+      ];
+    }
+  });
   const keys=Object.keys(data).sort();
   if(keys.length){
     const last=keys[keys.length-1];
@@ -323,12 +373,27 @@ function loadAll(){
     activeMonth={year:parseInt(parts[0]),month:parseInt(parts[1])};
   }
   currentKey=monthKey(activeMonth.year,activeMonth.month);
+  document.getElementById('appTitle').textContent=settings.appTitle||'💰 Budget';
   buildMonthDropdown();
   renderAll();
 }
 
 function saveAll(){localStorage.setItem('budgetAllMonths_v3',JSON.stringify(data));}
-function getMonthData(){return data[currentKey];}
+function saveSettings(){localStorage.setItem('budgetSettings',JSON.stringify(settings));}
+function getD(){return data[currentKey];}
+
+function toggleEditMode(){
+  editMode=!editMode;
+  document.body.classList.toggle('edit-mode',editMode);
+  document.getElementById('editToggleBtn').classList.toggle('active',editMode);
+  document.getElementById('editBanner').classList.toggle('show',editMode);
+  if(!editMode){
+    // Save on exit edit mode
+    saveAll();saveSettings();
+    toast('Changes saved ✓');
+    renderAll();
+  }
+}
 
 function buildMonthDropdown(){
   const sel=document.getElementById('monthSelect');
@@ -371,7 +436,7 @@ function closeModal(){document.getElementById('newMonthModal').classList.remove(
 function createNewMonth(){
   const key=document.getElementById('newMonthSelect').value;
   if(!key){closeModal();return;}
-  const prev=JSON.parse(JSON.stringify(getMonthData()));
+  const prev=JSON.parse(JSON.stringify(getD()));
   prev.expenses.forEach(e=>e.paid=false);
   data[key]=prev;
   saveAll();closeModal();
@@ -392,25 +457,23 @@ function toast(msg){
   setTimeout(()=>el.classList.remove('show'),2200);
 }
 
-function totalIncome(){const d=getMonthData();return num(d.income.va)+num(d.income.cognitus)+num(d.income.other);}
-function totalExpenses(){return getMonthData().expenses.reduce((s,e)=>s+num(e.amount),0);}
-function totalLoanPayments(){return getMonthData().loans.reduce((s,l)=>s+num(l.monthly),0);}
-function totalDebt(){const d=getMonthData();return d.creditCards.reduce((s,c)=>s+num(c.balance),0)+d.loans.reduce((s,l)=>s+num(l.balance),0);}
+function totalIncome(){return getD().income.reduce((s,i)=>s+num(i.amount),0);}
+function totalExpenses(){return getD().expenses.reduce((s,e)=>s+num(e.amount),0);}
+function totalLoanPayments(){return getD().loans.reduce((s,l)=>s+num(l.monthly),0);}
+function totalDebt(){const d=getD();return d.creditCards.reduce((s,c)=>s+num(c.balance),0)+d.loans.reduce((s,l)=>s+num(l.balance),0);}
 function remaining(){return totalIncome()-totalExpenses()-totalLoanPayments();}
-function totalCCBalance(){return getMonthData().creditCards.reduce((s,c)=>s+num(c.balance),0);}
-function totalCCLimit(){return getMonthData().creditCards.reduce((s,c)=>s+num(c.limit),0);}
-function paidCount(){const e=getMonthData().expenses;return e.filter(x=>x.paid).length+'/'+e.length;}
-function paidAmount(){return getMonthData().expenses.filter(x=>x.paid).reduce((s,e)=>s+num(e.amount),0);}
+function totalCCBalance(){return getD().creditCards.reduce((s,c)=>s+num(c.balance),0);}
+function totalCCLimit(){return getD().creditCards.reduce((s,c)=>s+num(c.limit),0);}
+function paidCount(){const e=getD().expenses;return e.filter(x=>x.paid).length+'/'+e.length;}
+function paidAmount(){return getD().expenses.filter(x=>x.paid).reduce((s,e)=>s+num(e.amount),0);}
 
 function renderAll(){
-  const d=getMonthData();
-  document.getElementById('banner-title').textContent=monthLabel(activeMonth.year,activeMonth.month);
   const n=new Date();
-  const isCurrent=n.getFullYear()===activeMonth.year&&n.getMonth()===activeMonth.month;
-  document.getElementById('banner-sub').textContent=isCurrent?'Current month':monthLabel(activeMonth.year,activeMonth.month);
+  document.getElementById('banner-title').textContent=monthLabel(activeMonth.year,activeMonth.month);
+  document.getElementById('banner-sub').textContent=(n.getFullYear()===activeMonth.year&&n.getMonth()===activeMonth.month)?'Current month':'Past month';
   document.getElementById('paid-summary').innerHTML=`<span style="font-weight:500">${paidCount()} paid</span><br>${fmt(paidAmount())} of ${fmt(totalExpenses())}`;
   renderMetrics();renderPie();renderBar();renderCCDash();renderDebtDash();
-  renderIncomeForm();renderExpList();renderCCList();renderLoanList();renderGoalsEdit();
+  renderIncomeFields();renderExpList();renderCCList();renderLoanList();renderGoalsEdit();
 }
 
 function renderMetrics(){
@@ -424,7 +487,7 @@ function renderMetrics(){
 }
 
 function renderPie(){
-  const d=getMonthData(),cats=[];
+  const d=getD(),cats=[];
   d.expenses.forEach(e=>{if(e.name&&num(e.amount)>0)cats.push({name:e.name,val:num(e.amount)});});
   d.loans.forEach(l=>{if(l.name&&num(l.monthly)>0)cats.push({name:l.name,val:num(l.monthly)});});
   const total=cats.reduce((s,c)=>s+c.val,0);
@@ -444,10 +507,9 @@ function renderBar(){
   const labels=[],vals=[];
   sortedKeys.forEach(k=>{
     const parts=k.replace('budget_','').split('_');
-    const y=parseInt(parts[0]),m=parseInt(parts[1]);
-    labels.push(MONTH_NAMES[m].slice(0,3));
+    labels.push(MONTH_NAMES[parseInt(parts[1])].slice(0,3));
     const md=data[k];
-    const inc=num(md.income.va)+num(md.income.cognitus)+num(md.income.other);
+    const inc=Array.isArray(md.income)?md.income.reduce((s,i)=>s+num(i.amount),0):(num(md.income.va)+num(md.income.cognitus)+num(md.income.other));
     const exp=md.expenses.reduce((s,e)=>s+num(e.amount),0);
     const loans=md.loans.reduce((s,l)=>s+num(l.monthly),0);
     vals.push(Math.round(inc-exp-loans));
@@ -463,10 +525,10 @@ function renderBar(){
 }
 
 function renderCCDash(){
-  const d=getMonthData();
+  const d=getD();
   const active=d.creditCards.filter(c=>num(c.balance)>0);
   const tb=totalCCBalance(),tl=totalCCLimit(),op=pct(tb,tl);
-  let html=`<table class="data-table"><thead><tr><th>Card</th><th>Balance</th><th>Limit</th><th>% Used</th></tr></thead><tbody>`;
+  let html=`<table class="data-table"><thead><tr><th>Card</th><th>Balance</th><th>Limit</th><th>%</th></tr></thead><tbody>`;
   active.forEach(c=>{
     const p=pct(num(c.balance),num(c.limit));
     const cls=p>=80?'badge-red':p>=30?'badge-amber':'badge-green';
@@ -478,7 +540,7 @@ function renderCCDash(){
 }
 
 function renderDebtDash(){
-  const d=getMonthData();
+  const d=getD();
   let html=`<table class="data-table"><thead><tr><th>Loan</th><th>Monthly</th><th>Balance</th></tr></thead><tbody>`;
   d.loans.forEach(l=>{html+=`<tr><td>${l.name}</td><td>${fmt(l.monthly)}</td><td>${fmt(l.balance)}</td></tr>`;});
   const tb=d.loans.reduce((s,l)=>s+num(l.balance),0),tm=d.loans.reduce((s,l)=>s+num(l.monthly),0);
@@ -486,101 +548,218 @@ function renderDebtDash(){
   document.getElementById('debt-dash').innerHTML=html;
 }
 
-function renderIncomeForm(){
-  const d=getMonthData();
-  document.getElementById('inc-va').value=d.income.va||'';
-  document.getElementById('inc-cognitus').value=d.income.cognitus||'';
-  document.getElementById('inc-other').value=d.income.other||'';
-}
-
-function renderExpList(){
-  const d=getMonthData();
-  document.getElementById('exp-list').innerHTML=d.expenses.map((e,i)=>`
-    <div class="exp-item expense-row ${e.paid?'paid-row':''}">
-      <input class="exp-name" type="text" value="${e.name||''}" placeholder="Name" oninput="getMonthData().expenses[${i}].name=this.value">
-      <select oninput="getMonthData().expenses[${i}].type=this.value">
-        <option ${e.type==='Fixed'?'selected':''}>Fixed</option>
-        <option ${e.type==='Subscription'?'selected':''}>Subscription</option>
-        <option ${e.type==='Variable'?'selected':''}>Variable</option>
-      </select>
-      <input class="amt" type="number" value="${e.amount||''}" placeholder="0" min="0" inputmode="decimal" oninput="getMonthData().expenses[${i}].amount=parseFloat(this.value)||0">
-      <input class="paid-check" type="checkbox" ${e.paid?'checked':''} onchange="togglePaid(${i},this.checked)">
-      <button class="del-btn" onclick="delExpense(${i})" aria-label="Remove">×</button>
+// INCOME
+function renderIncomeFields(){
+  const d=getD();
+  document.getElementById('income-fields').innerHTML=d.income.map((inc,i)=>`
+    <div class="income-row">
+      <span class="income-label">${inc.label}</span>
+      <input class="income-label-input" type="text" value="${inc.label}" placeholder="Label" oninput="getD().income[${i}].label=this.value">
+      <div class="dollar-wrap">
+        <span class="dollar-sign">$</span>
+        <input type="number" value="${inc.amount||''}" placeholder="0" min="0" inputmode="decimal"
+          style="flex:1;background:transparent;border:none;padding:3px 0;font-size:16px;font-weight:600;color:var(--text);font-family:inherit;outline:none;"
+          oninput="getD().income[${i}].amount=parseFloat(this.value)||0">
+      </div>
     </div>`).join('');
 }
 
+// EXPENSES
+function renderExpList(){
+  const d=getD();
+  document.getElementById('exp-list').innerHTML=d.expenses.map((e,i)=>`
+    <div class="exp-item ${e.paid?'paid-row':''}">
+      <div class="exp-view">
+        <input class="paid-check exp-view-paid" type="checkbox" ${e.paid?'checked':''} onchange="togglePaid(${i},this.checked)">
+        <span class="exp-view-name">${e.name||'Expense'}</span>
+        <span class="exp-view-type">${e.type}</span>
+        <span class="exp-view-amount">${fmt(e.amount,2)}</span>
+      </div>
+      <div class="exp-edit-row">
+        <div class="exp-edit-grid">
+          <div class="exp-edit-field">
+            <label>Name</label>
+            <input type="text" value="${e.name||''}" placeholder="Name" oninput="getD().expenses[${i}].name=this.value;refreshExpItem(${i})">
+          </div>
+          <div class="exp-edit-field">
+            <label>Type</label>
+            <select oninput="getD().expenses[${i}].type=this.value;refreshExpItem(${i})">
+              <option ${e.type==='Fixed'?'selected':''}>Fixed</option>
+              <option ${e.type==='Subscription'?'selected':''}>Subscription</option>
+              <option ${e.type==='Variable'?'selected':''}>Variable</option>
+            </select>
+          </div>
+        </div>
+        <div class="exp-edit-field" style="margin-bottom:8px">
+          <label>Amount</label>
+          <div class="amount-input-wrap">
+            <span class="ds">$</span>
+            <input type="number" value="${e.amount||''}" placeholder="0" min="0" inputmode="decimal" oninput="getD().expenses[${i}].amount=parseFloat(this.value)||0;refreshExpItem(${i})">
+          </div>
+        </div>
+        <button class="del-exp-btn" onclick="delExpense(${i})">🗑 Remove expense</button>
+      </div>
+    </div>`).join('');
+}
+
+function refreshExpItem(i){
+  const e=getD().expenses[i];
+  const items=document.querySelectorAll('#exp-list .exp-item');
+  if(items[i]){
+    items[i].querySelector('.exp-view-name').textContent=e.name||'Expense';
+    items[i].querySelector('.exp-view-type').textContent=e.type;
+    items[i].querySelector('.exp-view-amount').textContent=fmt(e.amount,2);
+  }
+}
+
 function togglePaid(i,checked){
-  getMonthData().expenses[i].paid=checked;
+  getD().expenses[i].paid=checked;
   saveAll();
   document.getElementById('paid-summary').innerHTML=`<span style="font-weight:500">${paidCount()} paid</span><br>${fmt(paidAmount())} of ${fmt(totalExpenses())}`;
   renderExpList();
 }
 
-function addExpense(){getMonthData().expenses.push({name:'',type:'Fixed',amount:0,paid:false});renderExpList();}
-function delExpense(i){getMonthData().expenses.splice(i,1);renderExpList();}
+function addExpense(){getD().expenses.push({name:'',type:'Fixed',amount:0,paid:false});renderExpList();}
+function delExpense(i){getD().expenses.splice(i,1);renderExpList();}
 
+// CREDIT CARDS
 function renderCCList(){
-  const d=getMonthData();
-  document.getElementById('cc-list').innerHTML=d.creditCards.map((c,i)=>`
-    <div class="exp-item cc-row">
-      <input type="text" value="${c.name||''}" placeholder="Card name" oninput="getMonthData().creditCards[${i}].name=this.value">
-      <input class="amt" type="number" value="${c.balance||''}" placeholder="0" min="0" inputmode="decimal" oninput="getMonthData().creditCards[${i}].balance=parseFloat(this.value)||0">
-      <input class="amt" type="number" value="${c.limit||''}" placeholder="0" min="0" inputmode="decimal" oninput="getMonthData().creditCards[${i}].limit=parseFloat(this.value)||0">
-      <span style="font-size:12px;font-weight:500;text-align:right">${pct(num(c.balance),num(c.limit))}%</span>
-      <button class="del-btn" onclick="delCC(${i})" aria-label="Remove">×</button>
-    </div>`).join('');
-}
-
-function addCC(){getMonthData().creditCards.push({name:'',balance:0,limit:0});renderCCList();}
-function delCC(i){getMonthData().creditCards.splice(i,1);renderCCList();}
-
-function renderLoanList(){
-  const d=getMonthData();
-  document.getElementById('loan-list').innerHTML=d.loans.map((l,i)=>`
-    <div class="exp-item loan-row">
-      <input type="text" value="${l.name||''}" placeholder="Loan name" oninput="getMonthData().loans[${i}].name=this.value">
-      <input class="amt" type="number" value="${l.monthly||''}" placeholder="0" min="0" inputmode="decimal" oninput="getMonthData().loans[${i}].monthly=parseFloat(this.value)||0">
-      <input class="amt" type="number" value="${l.balance||''}" placeholder="0" min="0" inputmode="decimal" oninput="getMonthData().loans[${i}].balance=parseFloat(this.value)||0">
-      <button class="del-btn" onclick="delLoan(${i})" aria-label="Remove">×</button>
-    </div>`).join('');
-}
-
-function addLoan(){getMonthData().loans.push({name:'',monthly:0,balance:0});renderLoanList();}
-function delLoan(i){getMonthData().loans.splice(i,1);renderLoanList();}
-
-function renderGoalsEdit(){
-  const d=getMonthData();
-  if(!d.goals.length){document.getElementById('goals-edit').innerHTML='<div style="text-align:center;padding:1rem;color:var(--muted);font-size:13px">No goals yet.</div>';return;}
-  document.getElementById('goals-edit').innerHTML=d.goals.map((g,i)=>{
-    const p=g.target>0?Math.min(100,Math.round(num(g.saved)/num(g.target)*100)):0;
-    return`<div style="margin-bottom:16px">
-      <div style="display:grid;grid-template-columns:1fr 100px 100px 28px;gap:6px;align-items:end;margin-bottom:8px">
-        <div><div style="font-size:10px;color:var(--muted);text-transform:uppercase;margin-bottom:3px">Goal</div>
-          <input type="text" value="${g.name||''}" placeholder="Goal name" oninput="getMonthData().goals[${i}].name=this.value;renderGoalsEdit()"></div>
-        <div><div style="font-size:10px;color:var(--muted);text-transform:uppercase;margin-bottom:3px">Target</div>
-          <input type="number" value="${g.target||''}" placeholder="0" min="0" inputmode="decimal" oninput="getMonthData().goals[${i}].target=parseFloat(this.value)||0;renderGoalsEdit()"></div>
-        <div><div style="font-size:10px;color:var(--muted);text-transform:uppercase;margin-bottom:3px">Saved</div>
-          <input type="number" value="${g.saved||''}" placeholder="0" min="0" inputmode="decimal" oninput="getMonthData().goals[${i}].saved=parseFloat(this.value)||0;renderGoalsEdit()"></div>
-        <button class="del-btn" onclick="delGoal(${i})" aria-label="Remove" style="align-self:center">×</button>
+  const d=getD();
+  document.getElementById('cc-list').innerHTML=d.creditCards.map((c,i)=>{
+    const p=pct(num(c.balance),num(c.limit));
+    const cls=p>=80?'badge-red':p>=30?'badge-amber':'badge-green';
+    return`<div class="cc-item">
+      <div class="cc-view">
+        <span class="cc-view-name">${c.name||'Card'}</span>
+        <span class="cc-view-bal">${fmt(c.balance)}</span>
+        <span class="badge ${cls} cc-view-util">${p}%</span>
       </div>
-      <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:4px">
-        <span>${g.name||'Goal'}</span><span>${fmt(g.saved||0)} / ${fmt(g.target||0)} · ${p}%</span>
+      <div class="cc-edit">
+        <div class="cc-edit-grid">
+          <div class="cc-edit-field" style="grid-column:span 3">
+            <label>Card name</label>
+            <input type="text" value="${c.name||''}" placeholder="Card name" oninput="getD().creditCards[${i}].name=this.value;refreshCC(${i})">
+          </div>
+          <div class="cc-edit-field">
+            <label>Balance</label>
+            <div class="amount-input-wrap"><span class="ds">$</span>
+            <input type="number" value="${c.balance||''}" placeholder="0" min="0" inputmode="decimal" oninput="getD().creditCards[${i}].balance=parseFloat(this.value)||0;refreshCC(${i})"></div>
+          </div>
+          <div class="cc-edit-field">
+            <label>Limit</label>
+            <div class="amount-input-wrap"><span class="ds">$</span>
+            <input type="number" value="${c.limit||''}" placeholder="0" min="0" inputmode="decimal" oninput="getD().creditCards[${i}].limit=parseFloat(this.value)||0;refreshCC(${i})"></div>
+          </div>
+          <div class="cc-edit-field" style="display:flex;align-items:flex-end">
+            <button class="del-exp-btn" style="width:100%" onclick="delCC(${i})">🗑 Remove</button>
+          </div>
+        </div>
       </div>
-      <div class="progress-bar"><div class="progress-fill" style="width:${p}%"></div></div>
     </div>`;
   }).join('');
 }
 
-function addGoal(){getMonthData().goals.push({name:'',target:0,saved:0});renderGoalsEdit();}
-function delGoal(i){getMonthData().goals.splice(i,1);renderGoalsEdit();}
-
-function saveIncome(){
-  const d=getMonthData();
-  d.income.va=num(document.getElementById('inc-va').value);
-  d.income.cognitus=num(document.getElementById('inc-cognitus').value);
-  d.income.other=num(document.getElementById('inc-other').value);
-  saveAll();renderMetrics();renderPie();renderBar();toast('Income saved ✓');
+function refreshCC(i){
+  const c=getD().creditCards[i];
+  const items=document.querySelectorAll('.cc-item');
+  if(items[i]){
+    const p=pct(num(c.balance),num(c.limit));
+    const cls=p>=80?'badge-red':p>=30?'badge-amber':'badge-green';
+    items[i].querySelector('.cc-view-name').textContent=c.name||'Card';
+    items[i].querySelector('.cc-view-bal').textContent=fmt(c.balance);
+    items[i].querySelector('.cc-view-util').textContent=p+'%';
+    items[i].querySelector('.cc-view-util').className=`badge ${cls} cc-view-util`;
+  }
 }
+
+function addCC(){getD().creditCards.push({name:'',balance:0,limit:0});renderCCList();}
+function delCC(i){getD().creditCards.splice(i,1);renderCCList();}
+
+// LOANS
+function renderLoanList(){
+  const d=getD();
+  document.getElementById('loan-list').innerHTML=d.loans.map((l,i)=>`
+    <div class="loan-item">
+      <div class="cc-view">
+        <span class="cc-view-name">${l.name||'Loan'}</span>
+        <span style="font-size:13px;color:var(--muted)">${fmt(l.monthly)}/mo</span>
+        <span class="cc-view-bal">${fmt(l.balance)}</span>
+      </div>
+      <div class="cc-edit">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+          <div class="cc-edit-field" style="grid-column:span 2">
+            <label>Loan name</label>
+            <input type="text" value="${l.name||''}" placeholder="Loan name" oninput="getD().loans[${i}].name=this.value;refreshLoan(${i})">
+          </div>
+          <div class="cc-edit-field">
+            <label>Monthly payment</label>
+            <div class="amount-input-wrap"><span class="ds">$</span>
+            <input type="number" value="${l.monthly||''}" placeholder="0" min="0" inputmode="decimal" oninput="getD().loans[${i}].monthly=parseFloat(this.value)||0;refreshLoan(${i})"></div>
+          </div>
+          <div class="cc-edit-field">
+            <label>Balance owed</label>
+            <div class="amount-input-wrap"><span class="ds">$</span>
+            <input type="number" value="${l.balance||''}" placeholder="0" min="0" inputmode="decimal" oninput="getD().loans[${i}].balance=parseFloat(this.value)||0;refreshLoan(${i})"></div>
+          </div>
+        </div>
+        <button class="del-exp-btn" onclick="delLoan(${i})">🗑 Remove loan</button>
+      </div>
+    </div>`).join('');
+}
+
+function refreshLoan(i){
+  const l=getD().loans[i];
+  const items=document.querySelectorAll('.loan-item');
+  if(items[i]){
+    items[i].querySelector('.cc-view-name').textContent=l.name||'Loan';
+    items[i].querySelector('.cc-view-bal').textContent=fmt(l.balance);
+  }
+}
+
+function addLoan(){getD().loans.push({name:'',monthly:0,balance:0});renderLoanList();}
+function delLoan(i){getD().loans.splice(i,1);renderLoanList();}
+
+// GOALS
+function renderGoalsEdit(){
+  const d=getD();
+  if(!d.goals.length){document.getElementById('goals-edit').innerHTML='<div style="text-align:center;padding:1rem;color:var(--muted);font-size:13px">No goals yet.</div>';return;}
+  document.getElementById('goals-edit').innerHTML=d.goals.map((g,i)=>{
+    const p=g.target>0?Math.min(100,Math.round(num(g.saved)/num(g.target)*100)):0;
+    return`<div class="loan-item" style="margin-bottom:6px">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px">
+        <span style="font-weight:500;font-size:14px">${g.name||'Goal'}</span>
+        <span style="font-size:12px;color:var(--muted)">${fmt(g.saved||0)} / ${fmt(g.target||0)} · ${p}%</span>
+      </div>
+      <div class="progress-bar" style="margin-bottom:8px"><div class="progress-fill" style="width:${p}%"></div></div>
+      <div class="cc-edit">
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px">
+          <div class="cc-edit-field" style="grid-column:span 3">
+            <label>Goal name</label>
+            <input type="text" value="${g.name||''}" placeholder="Goal name" oninput="getD().goals[${i}].name=this.value;renderGoalsEdit()">
+          </div>
+          <div class="cc-edit-field">
+            <label>Target</label>
+            <div class="amount-input-wrap"><span class="ds">$</span>
+            <input type="number" value="${g.target||''}" placeholder="0" min="0" inputmode="decimal" oninput="getD().goals[${i}].target=parseFloat(this.value)||0;renderGoalsEdit()"></div>
+          </div>
+          <div class="cc-edit-field">
+            <label>Saved</label>
+            <div class="amount-input-wrap"><span class="ds">$</span>
+            <input type="number" value="${g.saved||''}" placeholder="0" min="0" inputmode="decimal" oninput="getD().goals[${i}].saved=parseFloat(this.value)||0;renderGoalsEdit()"></div>
+          </div>
+          <div class="cc-edit-field" style="display:flex;align-items:flex-end">
+            <button class="del-exp-btn" style="width:100%" onclick="delGoal(${i})">🗑</button>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function addGoal(){getD().goals.push({name:'',target:0,saved:0});renderGoalsEdit();}
+function delGoal(i){getD().goals.splice(i,1);renderGoalsEdit();}
+
+function saveIncome(){saveAll();renderMetrics();renderPie();renderBar();toast('Income saved ✓');}
 function saveExpenses(){saveAll();renderMetrics();renderPie();renderBar();toast('Expenses saved ✓');}
 function saveCreditCards(){saveAll();renderCCDash();toast('Cards saved ✓');}
 function saveLoans(){saveAll();renderMetrics();renderDebtDash();renderBar();toast('Loans saved ✓');}
@@ -592,11 +771,8 @@ function switchTab(name){
   document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id==='page-'+name));
 }
 
-// Register service worker
 if('serviceWorker' in navigator){
-  window.addEventListener('load',()=>{
-    navigator.serviceWorker.register('sw.js').catch(()=>{});
-  });
+  window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
 }
 
 loadAll();
