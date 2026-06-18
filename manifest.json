@@ -2,7 +2,7 @@
   "name": "My Budget",
   "short_name": "Budget",
   "description": "Personal monthly budget tracker",
-  "start_url": "/budget/",
+  "start_url": "/Budget/",
   "display": "standalone",
   "background_color": "#1a4a4a",
   "theme_color": "#1a4a4a",
