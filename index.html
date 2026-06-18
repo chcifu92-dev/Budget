@@ -417,7 +417,7 @@ body.em .loan-row,.em .exp-row,.em .inc-row,.em .cc-row,.em .goal-row{outline:no
 
 <script>
 const COLORS=['#534AB7','#1D9E75','#D85A30','#BA7517','#185FA5','#993556','#639922','#D4537E','#0F6E56','#854F0B'];
-const CAT_COLORS={'Fixed':'#534AB7','Subscription':'#1D9E75','Variable':'#D85A30','Loans':'#BA7517'};
+const CAT_COLORS={'Fixed':'#1D9E75','Subscription':'#D85A30','Variable':'#185FA5','Loans':'#EFC94C'};
 const MN=['January','February','March','April','May','June','July','August','September','October','November','December'];
 const EXP_COLORS=['#EEEDFE','#E6F1FB','#EAF3DE','#FAEEDA','#FAECE7','#E1F5EE','#FBEAF0','#FCEBEB'];
 const EXP_ICON_COLORS=['#534AB7','#185FA5','#3B6D11','#854F0B','#993C1D','#0F6E56','#993556','#A32D2D'];
@@ -657,10 +657,36 @@ function renderBar(){
   });
   if(barC)barC.destroy();
   barC=new Chart(document.getElementById('barChart'),{
-    type:'bar',
-    data:{labels:lbls,datasets:[{data:vals,backgroundColor:vals.map(v=>v>=0?'#5B4FE8':'#D85A30'),borderRadius:6,borderWidth:0}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>` ${f(ctx.raw)}`}}},
-      scales:{y:{ticks:{callback:v=>'$'+v.toLocaleString(),font:{size:10}},grid:{color:'rgba(128,128,128,0.08)'}},x:{grid:{display:false},ticks:{font:{size:11}}}}}
+    type:'line',
+    data:{labels:lbls,datasets:[{
+      data:vals,
+      borderColor:'#5B4FE8',
+      borderWidth:2.5,
+      pointRadius:0,
+      pointHoverRadius:5,
+      pointHoverBackgroundColor:'#5B4FE8',
+      pointHoverBorderColor:'#fff',
+      pointHoverBorderWidth:2,
+      fill:true,
+      backgroundColor:(ctx)=>{
+        const chart=ctx.chart;
+        const {ctx:c,chartArea}=chart;
+        if(!chartArea)return'rgba(91,79,232,0.1)';
+        const grad=c.createLinearGradient(0,chartArea.top,0,chartArea.bottom);
+        grad.addColorStop(0,'rgba(91,79,232,0.25)');
+        grad.addColorStop(1,'rgba(91,79,232,0.0)');
+        return grad;
+      },
+      tension:0.4
+    }]},
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>` ${f(ctx.raw)}`},mode:'index',intersect:false}},
+      scales:{
+        y:{ticks:{callback:v=>'$'+v.toLocaleString(),font:{size:10}},grid:{color:'rgba(128,128,128,0.08)'},border:{display:false}},
+        x:{grid:{display:false},ticks:{font:{size:11}},border:{display:false}}
+      }
+    }
   });
 }
 
