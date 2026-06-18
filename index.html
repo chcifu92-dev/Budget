@@ -48,6 +48,7 @@
   .banner{background:var(--surface);border:0.5px solid var(--border);border-radius:12px;padding:12px 16px;margin-bottom:1.25rem;display:flex;align-items:center;justify-content:space-between}
   .banner-title{font-size:18px;font-weight:600}
   .banner-sub{font-size:12px;color:var(--muted)}
+  .del-month-btn{background:#fcebeb;border:none;border-radius:8px;padding:7px 12px;color:#a32d2d;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;white-space:nowrap;flex-shrink:0}
 
   .mgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:1.25rem}
   .metric{background:var(--surface);border:0.5px solid var(--border);border-radius:12px;padding:14px 16px}
@@ -57,6 +58,12 @@
 
   .card{background:var(--surface);border:0.5px solid var(--border);border-radius:14px;padding:1rem 1.125rem;margin-bottom:1rem}
   .ctitle{font-size:11px;font-weight:500;color:var(--muted);margin-bottom:1rem;text-transform:uppercase;letter-spacing:.04em}
+
+  /* pie toggle */
+  .pie-toggle{display:flex;gap:6px;margin-bottom:12px}
+  .pie-toggle button{flex:1;padding:7px;font-size:12px;font-weight:500;border:0.5px solid var(--border2);border-radius:8px;background:var(--surface2);color:var(--muted);cursor:pointer;font-family:inherit}
+  .pie-toggle button.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+
   .legend{display:flex;flex-wrap:wrap;gap:8px 14px;margin-bottom:12px;font-size:12px;color:var(--muted)}
   .legend span{display:flex;align-items:center;gap:5px}
   .ld{width:10px;height:10px;border-radius:2px;flex-shrink:0}
@@ -67,12 +74,10 @@
   .dtable tr:last-child td{border-bottom:none}
   .dtable .trow td{font-weight:600;background:var(--surface2)}
 
-  /* shared input styles */
   .finput{width:100%;background:var(--surface2);border:0.5px solid var(--border2);border-radius:8px;padding:9px 12px;font-size:15px;color:var(--text);font-family:inherit;outline:none}
   .finput:focus{border-color:var(--accent)}
   select.finput{font-size:14px}
 
-  /* $ amount wrapper */
   .awrap{display:flex;align-items:center;background:var(--surface2);border:0.5px solid var(--border2);border-radius:8px;overflow:hidden}
   .awrap:focus-within{border-color:var(--accent)}
   .awrap .ds{padding:9px 2px 9px 12px;font-size:15px;color:var(--muted);background:transparent;flex-shrink:0}
@@ -84,17 +89,13 @@
   .add-btn:active{background:var(--surface2)}
   .del-btn{background:#fcebeb;border:none;border-radius:8px;padding:7px 12px;color:#a32d2d;font-size:13px;cursor:pointer;font-family:inherit;white-space:nowrap}
 
-  /* INCOME */
   .inc-row{background:var(--surface2);border-radius:10px;padding:12px;margin-bottom:8px}
   .inc-view{display:flex;align-items:center;gap:10px}
   .inc-lbl{font-size:13px;font-weight:500;color:var(--muted);min-width:80px}
   .inc-amt{font-size:18px;font-weight:700;color:var(--accent);flex:1;text-align:right}
-  .inc-edit{display:none;margin-top:10px;border-top:0.5px solid var(--border);padding-top:10px;display:none}
-  .inc-edit-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-  .flabel{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.03em;margin-bottom:4px}
+  .inc-edit{display:none;margin-top:10px;border-top:0.5px solid var(--border);padding-top:10px}
 
-  /* EXPENSES */
-  .exp-item{background:var(--surface2);border-radius:10px;padding:12px;margin-bottom:8px;transition:border .2s}
+  .exp-item{background:var(--surface2);border-radius:10px;padding:12px;margin-bottom:8px}
   .exp-view{display:flex;align-items:center;gap:8px}
   .exp-chk{width:20px;height:20px;accent-color:var(--green);cursor:pointer;flex-shrink:0}
   .exp-name{flex:1;font-size:14px;font-weight:500}
@@ -105,7 +106,6 @@
   .paid-row{background:rgba(29,158,117,0.07)!important}
   .paid-row .exp-name{text-decoration:line-through;color:var(--muted)}
 
-  /* CC / LOAN / GOAL items */
   .list-item{background:var(--surface2);border-radius:10px;padding:12px;margin-bottom:8px}
   .item-view{display:flex;align-items:center;gap:8px}
   .item-name{flex:1;font-size:14px;font-weight:500}
@@ -113,7 +113,7 @@
   .item-sub{font-size:12px;color:var(--muted)}
   .item-edit{display:none;margin-top:10px;border-top:0.5px solid var(--border);padding-top:10px}
   .edit-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
-  .edit-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px}
+  .flabel{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.03em;margin-bottom:4px}
 
   .badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:500}
   .bg{background:#e1f5ee;color:#0F6E56}.ba{background:#faeeda;color:#854F0B}.br{background:#fcebeb;color:#A32D2D}
@@ -121,7 +121,6 @@
   .pbar{height:8px;background:var(--surface);border-radius:4px;overflow:hidden;margin:6px 0}
   .pfill{height:100%;border-radius:4px;background:var(--green);transition:width .4s}
 
-  /* EDIT MODE — show edit sections */
   body.em .inc-edit{display:block!important}
   body.em .exp-edit{display:block!important}
   body.em .item-edit{display:block!important}
@@ -141,6 +140,7 @@
   .mbtns{display:flex;gap:8px}
   .mbtns button{flex:1;padding:12px;border-radius:10px;font-size:15px;font-weight:500;cursor:pointer;font-family:inherit;border:0.5px solid var(--border2);background:var(--surface2);color:var(--text)}
   .mbtns .ok{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .mbtns .danger{background:#a32d2d;color:#fff;border-color:#a32d2d}
 </style>
 </head>
 <body>
@@ -149,10 +149,10 @@
   <h1>💰 Budget</h1>
   <select id="monthSelect" onchange="switchMonth(this.value)"></select>
   <button class="hdr-btn" onclick="showNewMonth()">+ New</button>
-  <button class="pencil-btn" id="pencilBtn" onclick="toggleEdit()" title="Edit mode">✏️</button>
+  <button class="pencil-btn" id="pencilBtn" onclick="toggleEdit()">✏️</button>
 </header>
 
-<div class="edit-bar" id="editBar">✏️ Edit mode on — change any name or amount, then tap ✏️ again to save.</div>
+<div class="edit-bar" id="editBar">✏️ Edit mode — change any name or amount. Tap ✏️ again to save.</div>
 
 <nav>
   <button class="active" onclick="go('dashboard')">Dashboard</button>
@@ -168,10 +168,21 @@
   <div id="page-dashboard" class="page active">
     <div class="banner">
       <div><div class="banner-title" id="btitle"></div><div class="banner-sub" id="bsub"></div></div>
-      <div id="paid-sum" style="text-align:right;font-size:13px;color:var(--muted)"></div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px">
+        <button class="del-month-btn" onclick="confirmDelMonth()">🗑 Delete month</button>
+        <div id="paid-sum" style="text-align:right;font-size:13px;color:var(--muted)"></div>
+      </div>
     </div>
     <div class="mgrid" id="metrics"></div>
-    <div class="card"><div class="ctitle">Spending breakdown</div><div class="legend" id="pie-leg"></div><div style="position:relative;width:100%;height:230px"><canvas id="pieChart" role="img" aria-label="Spending">Spending.</canvas></div></div>
+    <div class="card">
+      <div class="ctitle">Spending breakdown</div>
+      <div class="pie-toggle">
+        <button id="btn-cat" class="active" onclick="setPieMode('category')">By category</button>
+        <button id="btn-item" onclick="setPieMode('item')">By item</button>
+      </div>
+      <div class="legend" id="pie-leg"></div>
+      <div style="position:relative;width:100%;height:230px"><canvas id="pieChart" role="img" aria-label="Spending">Spending.</canvas></div>
+    </div>
     <div class="card"><div class="ctitle">Monthly savings history</div><div style="position:relative;width:100%;height:190px"><canvas id="barChart" role="img" aria-label="Savings">Savings.</canvas></div></div>
     <div class="card"><div class="ctitle">Credit utilization</div><div id="cc-dash"></div></div>
     <div class="card"><div class="ctitle">Loans & Affirm</div><div id="loan-dash"></div></div>
@@ -183,7 +194,7 @@
       <div class="ctitle">Monthly income</div>
       <div id="inc-list"></div>
       <button class="add-btn" onclick="addIncome()">+ Add income source</button>
-      <button class="save-btn" onclick="saveSection('income')">Save income</button>
+      <button class="save-btn" onclick="saveSection()">Save income</button>
     </div>
   </div>
 
@@ -193,7 +204,7 @@
       <div class="ctitle">Monthly expenses</div>
       <div id="exp-list"></div>
       <button class="add-btn" onclick="addExpense()">+ Add expense</button>
-      <button class="save-btn" onclick="saveSection('expenses')">Save expenses</button>
+      <button class="save-btn" onclick="saveSection()">Save expenses</button>
     </div>
   </div>
 
@@ -203,7 +214,7 @@
       <div class="ctitle">Credit cards</div>
       <div id="cc-list"></div>
       <button class="add-btn" onclick="addCC()">+ Add card</button>
-      <button class="save-btn" onclick="saveSection('credit')">Save cards</button>
+      <button class="save-btn" onclick="saveSection()">Save cards</button>
     </div>
   </div>
 
@@ -213,7 +224,7 @@
       <div class="ctitle">Loans & Affirm</div>
       <div id="loan-list"></div>
       <button class="add-btn" onclick="addLoan()">+ Add loan</button>
-      <button class="save-btn" onclick="saveSection('loans')">Save loans</button>
+      <button class="save-btn" onclick="saveSection()">Save loans</button>
     </div>
   </div>
 
@@ -223,14 +234,15 @@
       <div class="ctitle">Savings goals</div>
       <div id="goal-list"></div>
       <button class="add-btn" onclick="addGoal()">+ Add goal</button>
-      <button class="save-btn" onclick="saveSection('goals')">Save goals</button>
+      <button class="save-btn" onclick="saveSection()">Save goals</button>
     </div>
   </div>
 </main>
 
 <div class="toast" id="toast"></div>
 
-<div class="modal-bg" id="modal">
+<!-- New month modal -->
+<div class="modal-bg" id="modal-new">
   <div class="modal">
     <h2>Start a new month</h2>
     <p>Copies your setup from the current month. Paid checkboxes reset to unpaid.</p>
@@ -239,14 +251,27 @@
       <select id="newMonthSel" class="finput"></select>
     </div>
     <div class="mbtns">
-      <button onclick="closeModal()">Cancel</button>
+      <button onclick="closeModals()">Cancel</button>
       <button class="ok" onclick="createMonth()">Create</button>
     </div>
   </div>
 </div>
 
+<!-- Delete month modal -->
+<div class="modal-bg" id="modal-del">
+  <div class="modal">
+    <h2>Delete this month?</h2>
+    <p id="del-month-msg"></p>
+    <div class="mbtns">
+      <button onclick="closeModals()">Cancel</button>
+      <button class="danger" onclick="deleteMonth()">Yes, delete it</button>
+    </div>
+  </div>
+</div>
+
 <script>
-const COLORS=['#534AB7','#1D9E75','#D85A30','#BA7517','#185FA5','#993556','#639922','#D4537E','#0F6E56','#854F0B','#3C3489','#712B13'];
+const COLORS=['#534AB7','#1D9E75','#D85A30','#BA7517','#185FA5','#993556','#639922','#D4537E','#0F6E56','#854F0B'];
+const CAT_COLORS={'Fixed':'#534AB7','Subscription':'#1D9E75','Variable':'#D85A30','Loans':'#BA7517'};
 const MN=['January','February','March','April','May','June','July','August','September','October','November','December'];
 
 const DS=()=>({
@@ -300,18 +325,17 @@ const DS=()=>({
   ]
 });
 
-let data={}, cur='', am={year:2026,month:6}, em=false, pieC, barC;
+let data={},cur='',am={year:2026,month:6},em=false,pieC,barC,pieMode='category';
 
 function mkey(y,m){return`budget_${y}_${m}`}
 function mlbl(y,m){return`${MN[m]} ${y}`}
 function D(){return data[cur]}
-const n=v=>parseFloat(v)||0;
+const nv=v=>parseFloat(v)||0;
 const f=(v,d=0)=>(v<0?'-$':'$')+Math.abs(v).toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d});
 const pct=(a,b)=>b>0?Math.round(a/b*100):0;
 
 function init(){
   try{const r=localStorage.getItem('bgt_v4');if(r)data=JSON.parse(r);}catch(e){}
-  // migrate old format
   Object.keys(data).forEach(k=>{
     const d=data[k];
     if(d.income&&!Array.isArray(d.income)){
@@ -358,6 +382,10 @@ function switchMonth(k){
   am={year:+p[0],month:+p[1]};renderAll();
 }
 
+function closeModals(){
+  document.querySelectorAll('.modal-bg').forEach(m=>m.classList.remove('open'));
+}
+
 function showNewMonth(){
   const s=document.getElementById('newMonthSel');s.innerHTML='';
   const now=new Date();
@@ -366,28 +394,50 @@ function showNewMonth(){
     const k=mkey(d.getFullYear(),d.getMonth());
     if(!data[k]){const o=document.createElement('option');o.value=k;o.textContent=mlbl(d.getFullYear(),d.getMonth());s.appendChild(o);}
   }
-  document.getElementById('modal').classList.add('open');
+  document.getElementById('modal-new').classList.add('open');
 }
-function closeModal(){document.getElementById('modal').classList.remove('open');}
+
 function createMonth(){
-  const k=document.getElementById('newMonthSel').value;if(!k){closeModal();return;}
+  const k=document.getElementById('newMonthSel').value;if(!k){closeModals();return;}
   const prev=JSON.parse(JSON.stringify(D()));
   prev.expenses.forEach(e=>e.paid=false);
-  data[k]=prev;persist();closeModal();
+  data[k]=prev;persist();closeModals();
   cur=k;const p=k.replace('budget_','').split('_');am={year:+p[0],month:+p[1]};
   buildDrop();renderAll();toast(`${MN[am.month]} created ✓`);
 }
 
+function confirmDelMonth(){
+  const keys=Object.keys(data);
+  if(keys.length<=1){toast("Can't delete the only month!");return;}
+  document.getElementById('del-month-msg').textContent=
+    `This will permanently delete ${mlbl(am.year,am.month)} and all its data. This cannot be undone.`;
+  document.getElementById('modal-del').classList.add('open');
+}
+
+function deleteMonth(){
+  const keys=Object.keys(data);
+  if(keys.length<=1){closeModals();return;}
+  delete data[cur];
+  persist();closeModals();
+  // Switch to most recent remaining month
+  const remaining=Object.keys(data).sort();
+  cur=remaining[remaining.length-1];
+  const p=cur.replace('budget_','').split('_');
+  am={year:+p[0],month:+p[1]};
+  buildDrop();renderAll();
+  toast(`Month deleted`);
+}
+
 // calcs
-function tInc(){return D().income.reduce((s,i)=>s+n(i.amount),0);}
-function tExp(){return D().expenses.reduce((s,e)=>s+n(e.amount),0);}
-function tLoan(){return D().loans.reduce((s,l)=>s+n(l.monthly),0);}
-function tDebt(){const d=D();return d.creditCards.reduce((s,c)=>s+n(c.balance),0)+d.loans.reduce((s,l)=>s+n(l.balance),0);}
+function tInc(){return D().income.reduce((s,i)=>s+nv(i.amount),0);}
+function tExp(){return D().expenses.reduce((s,e)=>s+nv(e.amount),0);}
+function tLoan(){return D().loans.reduce((s,l)=>s+nv(l.monthly),0);}
+function tDebt(){const d=D();return d.creditCards.reduce((s,c)=>s+nv(c.balance),0)+d.loans.reduce((s,l)=>s+nv(l.balance),0);}
 function tRem(){return tInc()-tExp()-tLoan();}
-function tCCBal(){return D().creditCards.reduce((s,c)=>s+n(c.balance),0);}
-function tCCLim(){return D().creditCards.reduce((s,c)=>s+n(c.limit),0);}
+function tCCBal(){return D().creditCards.reduce((s,c)=>s+nv(c.balance),0);}
+function tCCLim(){return D().creditCards.reduce((s,c)=>s+nv(c.limit),0);}
 function paidCnt(){const e=D().expenses;return e.filter(x=>x.paid).length+'/'+e.length;}
-function paidAmt(){return D().expenses.filter(x=>x.paid).reduce((s,e)=>s+n(e.amount),0);}
+function paidAmt(){return D().expenses.filter(x=>x.paid).reduce((s,e)=>s+nv(e.amount),0);}
 
 function renderAll(){
   const now=new Date();
@@ -408,19 +458,60 @@ function renderMetrics(){
     <div class="metric"><div class="mlabel">Left over</div><div class="mval ${rc}">${f(rem)}</div></div>`;
 }
 
+function setPieMode(mode){
+  pieMode=mode;
+  document.getElementById('btn-cat').classList.toggle('active',mode==='category');
+  document.getElementById('btn-item').classList.toggle('active',mode==='item');
+  renderPie();
+}
+
 function renderPie(){
-  const d=D(),cats=[];
-  d.expenses.forEach(e=>{if(e.name&&n(e.amount)>0)cats.push({name:e.name,val:n(e.amount)});});
-  d.loans.forEach(l=>{if(l.name&&n(l.monthly)>0)cats.push({name:l.name,val:n(l.monthly)});});
+  const d=D();
+  let cats=[];
+
+  if(pieMode==='category'){
+    // Group by type + loans as a group
+    const groups={};
+    d.expenses.forEach(e=>{
+      if(!e.name||nv(e.amount)<=0)return;
+      const t=e.type||'Other';
+      groups[t]=(groups[t]||0)+nv(e.amount);
+    });
+    const loanTotal=d.loans.reduce((s,l)=>s+nv(l.monthly),0);
+    if(loanTotal>0)groups['Loans']=loanTotal;
+    cats=Object.entries(groups).map(([name,val])=>({name,val}));
+  } else {
+    d.expenses.forEach(e=>{if(e.name&&nv(e.amount)>0)cats.push({name:e.name,val:nv(e.amount)});});
+    d.loans.forEach(l=>{if(l.name&&nv(l.monthly)>0)cats.push({name:l.name,val:nv(l.monthly)});});
+  }
+
   const tot=cats.reduce((s,c)=>s+c.val,0);
   const leg=document.getElementById('pie-leg');
   if(!cats.length){leg.innerHTML='';return;}
-  leg.innerHTML=cats.map((c,i)=>`<span><span class="ld" style="background:${COLORS[i%COLORS.length]}"></span>${c.name} ${tot?Math.round(c.val/tot*100):0}%</span>`).join('');
+
+  // pick colors
+  const getColor=(name,i)=>{
+    if(pieMode==='category'&&CAT_COLORS[name])return CAT_COLORS[name];
+    return COLORS[i%COLORS.length];
+  };
+
+  leg.innerHTML=cats.map((c,i)=>`<span><span class="ld" style="background:${getColor(c.name,i)}"></span>${c.name} ${tot?Math.round(c.val/tot*100):0}% (${f(c.val)})</span>`).join('');
+
   if(pieC)pieC.destroy();
   pieC=new Chart(document.getElementById('pieChart'),{
     type:'doughnut',
-    data:{labels:cats.map(c=>c.name),datasets:[{data:cats.map(c=>c.val),backgroundColor:cats.map((_,i)=>COLORS[i%COLORS.length]),borderWidth:2,borderColor:'#fff'}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>` ${ctx.label}: ${f(ctx.raw,2)}`}}}}
+    data:{
+      labels:cats.map(c=>c.name),
+      datasets:[{
+        data:cats.map(c=>c.val),
+        backgroundColor:cats.map((c,i)=>getColor(c.name,i)),
+        borderWidth:2,borderColor:'#fff'
+      }]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>` ${ctx.label}: ${f(ctx.raw,2)} (${tot?Math.round(ctx.raw/tot*100):0}%)`}}}
+    }
   });
 }
 
@@ -431,8 +522,8 @@ function renderBar(){
     const p=k.replace('budget_','').split('_');
     lbls.push(MN[+p[1]].slice(0,3));
     const md=data[k];
-    const inc=Array.isArray(md.income)?md.income.reduce((s,i)=>s+n(i.amount),0):(n(md.income.va)+n(md.income.cognitus)+n(md.income.other));
-    vals.push(Math.round(inc-md.expenses.reduce((s,e)=>s+n(e.amount),0)-md.loans.reduce((s,l)=>s+n(l.monthly),0)));
+    const inc=Array.isArray(md.income)?md.income.reduce((s,i)=>s+nv(i.amount),0):(nv(md.income.va)+nv(md.income.cognitus)+nv(md.income.other));
+    vals.push(Math.round(inc-md.expenses.reduce((s,e)=>s+nv(e.amount),0)-md.loans.reduce((s,l)=>s+nv(l.monthly),0)));
   });
   if(barC)barC.destroy();
   barC=new Chart(document.getElementById('barChart'),{
@@ -444,10 +535,10 @@ function renderBar(){
 }
 
 function renderCCDash(){
-  const d=D(),act=d.creditCards.filter(c=>n(c.balance)>0);
+  const d=D(),act=d.creditCards.filter(c=>nv(c.balance)>0);
   const tb=tCCBal(),tl=tCCLim();
   let h=`<table class="dtable"><thead><tr><th>Card</th><th>Balance</th><th>Limit</th><th>%</th></tr></thead><tbody>`;
-  act.forEach(c=>{const p=pct(n(c.balance),n(c.limit));const cl=p>=80?'br':p>=30?'ba':'bg';h+=`<tr><td>${c.name}</td><td>${f(c.balance)}</td><td>${f(c.limit)}</td><td><span class="badge ${cl}">${p}%</span></td></tr>`;});
+  act.forEach(c=>{const p=pct(nv(c.balance),nv(c.limit));const cl=p>=80?'br':p>=30?'ba':'bg';h+=`<tr><td>${c.name}</td><td>${f(c.balance)}</td><td>${f(c.limit)}</td><td><span class="badge ${cl}">${p}%</span></td></tr>`;});
   if(!act.length)h+=`<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:1rem">No balances!</td></tr>`;
   h+=`<tr class="trow"><td>Total</td><td>${f(tb)}</td><td>${f(tl)}</td><td>${pct(tb,tl)}%</td></tr></tbody></table>`;
   document.getElementById('cc-dash').innerHTML=h;
@@ -457,29 +548,26 @@ function renderLoanDash(){
   const d=D();
   let h=`<table class="dtable"><thead><tr><th>Loan</th><th>Monthly</th><th>Balance</th></tr></thead><tbody>`;
   d.loans.forEach(l=>h+=`<tr><td>${l.name}</td><td>${f(l.monthly)}</td><td>${f(l.balance)}</td></tr>`);
-  const tb=d.loans.reduce((s,l)=>s+n(l.balance),0),tm=d.loans.reduce((s,l)=>s+n(l.monthly),0);
+  const tb=d.loans.reduce((s,l)=>s+nv(l.balance),0),tm=d.loans.reduce((s,l)=>s+nv(l.monthly),0);
   h+=`<tr class="trow"><td>Total</td><td>${f(tm)}/mo</td><td>${f(tb)}</td></tr></tbody></table>`;
   document.getElementById('loan-dash').innerHTML=h;
 }
 
-// ---- INCOME ----
+// INCOME
 function renderInc(){
-  const d=D();
-  document.getElementById('inc-list').innerHTML=d.income.map((inc,i)=>`
+  document.getElementById('inc-list').innerHTML=D().income.map((inc,i)=>`
     <div class="inc-row">
       <div class="inc-view">
         <span class="inc-lbl">${inc.label}</span>
         <span class="inc-amt">${f(inc.amount)}</span>
       </div>
       <div class="inc-edit">
-        <div class="inc-edit-grid" style="margin-bottom:8px">
-          <div>
-            <div class="flabel">Label</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+          <div><div class="flabel">Label</div>
             <input class="finput" type="text" value="${inc.label}" placeholder="Label"
               oninput="D().income[${i}].label=this.value;document.querySelectorAll('.inc-lbl')[${i}].textContent=this.value">
           </div>
-          <div>
-            <div class="flabel">Amount</div>
+          <div><div class="flabel">Amount</div>
             <div class="awrap"><span class="ds">$</span>
             <input type="number" value="${inc.amount||''}" placeholder="0" min="0" inputmode="decimal"
               oninput="D().income[${i}].amount=parseFloat(this.value)||0;document.querySelectorAll('.inc-amt')[${i}].textContent=f(D().income[${i}].amount)"></div>
@@ -492,10 +580,9 @@ function renderInc(){
 function addIncome(){D().income.push({label:'New income',amount:0});renderInc();}
 function delInc(i){D().income.splice(i,1);renderInc();}
 
-// ---- EXPENSES ----
+// EXPENSES
 function renderExp(){
-  const d=D();
-  document.getElementById('exp-list').innerHTML=d.expenses.map((e,i)=>`
+  document.getElementById('exp-list').innerHTML=D().expenses.map((e,i)=>`
     <div class="exp-item ${e.paid?'paid-row':''}">
       <div class="exp-view">
         <input class="exp-chk" type="checkbox" ${e.paid?'checked':''} onchange="togglePaid(${i},this.checked)">
@@ -505,13 +592,11 @@ function renderExp(){
       </div>
       <div class="exp-edit">
         <div class="exp-edit-grid">
-          <div>
-            <div class="flabel">Name</div>
+          <div><div class="flabel">Name</div>
             <input class="finput" type="text" value="${e.name||''}" placeholder="Name"
               oninput="D().expenses[${i}].name=this.value;updExp(${i})">
           </div>
-          <div>
-            <div class="flabel">Type</div>
+          <div><div class="flabel">Type</div>
             <select class="finput" onchange="D().expenses[${i}].type=this.value;updExp(${i})">
               <option ${e.type==='Fixed'?'selected':''}>Fixed</option>
               <option ${e.type==='Subscription'?'selected':''}>Subscription</option>
@@ -519,8 +604,7 @@ function renderExp(){
             </select>
           </div>
         </div>
-        <div style="margin-bottom:8px">
-          <div class="flabel">Amount</div>
+        <div style="margin-bottom:8px"><div class="flabel">Amount</div>
           <div class="awrap"><span class="ds">$</span>
           <input type="number" value="${e.amount||''}" placeholder="0" min="0" inputmode="decimal"
             oninput="D().expenses[${i}].amount=parseFloat(this.value)||0;updExp(${i})"></div>
@@ -529,7 +613,6 @@ function renderExp(){
       </div>
     </div>`).join('');
 }
-
 function updExp(i){
   const e=D().expenses[i];
   const items=document.querySelectorAll('.exp-item');
@@ -539,7 +622,6 @@ function updExp(i){
     items[i].querySelector('.exp-amt').textContent=f(e.amount,2);
   }
 }
-
 function togglePaid(i,v){
   D().expenses[i].paid=v;persist();
   document.getElementById('paid-sum').innerHTML=`<span style="font-weight:500">${paidCnt()} paid</span><br>${f(paidAmt())} of ${f(tExp())}`;
@@ -548,34 +630,30 @@ function togglePaid(i,v){
 function addExpense(){D().expenses.push({name:'',type:'Fixed',amount:0,paid:false});renderExp();}
 function delExp(i){D().expenses.splice(i,1);renderExp();}
 
-// ---- CREDIT CARDS ----
+// CREDIT CARDS
 function renderCC(){
-  const d=D();
-  document.getElementById('cc-list').innerHTML=d.creditCards.map((c,i)=>{
-    const p=pct(n(c.balance),n(c.limit));
+  document.getElementById('cc-list').innerHTML=D().creditCards.map((c,i)=>{
+    const p=pct(nv(c.balance),nv(c.limit));
     const cl=p>=80?'br':p>=30?'ba':'bg';
     return`<div class="list-item">
       <div class="item-view">
         <span class="item-name">${c.name||'Card'}</span>
-        <span class="item-sub">${pct(n(c.balance),n(c.limit))}% used</span>
+        <span class="item-sub">${p}% used</span>
         <span class="item-val">${f(c.balance)}</span>
         <span class="badge ${cl}">${p}%</span>
       </div>
       <div class="item-edit">
-        <div style="margin-bottom:8px">
-          <div class="flabel">Card name</div>
+        <div style="margin-bottom:8px"><div class="flabel">Card name</div>
           <input class="finput" type="text" value="${c.name||''}" placeholder="Card name"
             oninput="D().creditCards[${i}].name=this.value;updCC(${i})">
         </div>
         <div class="edit-grid-2">
-          <div>
-            <div class="flabel">Balance</div>
+          <div><div class="flabel">Balance</div>
             <div class="awrap"><span class="ds">$</span>
             <input type="number" value="${c.balance||''}" placeholder="0" min="0" inputmode="decimal"
               oninput="D().creditCards[${i}].balance=parseFloat(this.value)||0;updCC(${i})"></div>
           </div>
-          <div>
-            <div class="flabel">Credit limit</div>
+          <div><div class="flabel">Credit limit</div>
             <div class="awrap"><span class="ds">$</span>
             <input type="number" value="${c.limit||''}" placeholder="0" min="0" inputmode="decimal"
               oninput="D().creditCards[${i}].limit=parseFloat(this.value)||0;updCC(${i})"></div>
@@ -586,12 +664,11 @@ function renderCC(){
     </div>`;
   }).join('');
 }
-
 function updCC(i){
   const c=D().creditCards[i];
   const items=document.querySelectorAll('#cc-list .list-item');
   if(items[i]){
-    const p=pct(n(c.balance),n(c.limit));
+    const p=pct(nv(c.balance),nv(c.limit));
     const cl=p>=80?'br':p>=30?'ba':'bg';
     items[i].querySelector('.item-name').textContent=c.name||'Card';
     items[i].querySelector('.item-val').textContent=f(c.balance);
@@ -602,10 +679,9 @@ function updCC(i){
 function addCC(){D().creditCards.push({name:'',balance:0,limit:0});renderCC();}
 function delCC(i){D().creditCards.splice(i,1);renderCC();}
 
-// ---- LOANS ----
+// LOANS
 function renderLoans(){
-  const d=D();
-  document.getElementById('loan-list').innerHTML=d.loans.map((l,i)=>`
+  document.getElementById('loan-list').innerHTML=D().loans.map((l,i)=>`
     <div class="list-item">
       <div class="item-view">
         <span class="item-name">${l.name||'Loan'}</span>
@@ -613,20 +689,17 @@ function renderLoans(){
         <span class="item-val">${f(l.balance)}</span>
       </div>
       <div class="item-edit">
-        <div style="margin-bottom:8px">
-          <div class="flabel">Loan name</div>
+        <div style="margin-bottom:8px"><div class="flabel">Loan name</div>
           <input class="finput" type="text" value="${l.name||''}" placeholder="Loan name"
             oninput="D().loans[${i}].name=this.value;updLoan(${i})">
         </div>
         <div class="edit-grid-2">
-          <div>
-            <div class="flabel">Monthly payment</div>
+          <div><div class="flabel">Monthly payment</div>
             <div class="awrap"><span class="ds">$</span>
             <input type="number" value="${l.monthly||''}" placeholder="0" min="0" inputmode="decimal"
               oninput="D().loans[${i}].monthly=parseFloat(this.value)||0;updLoan(${i})"></div>
           </div>
-          <div>
-            <div class="flabel">Balance owed</div>
+          <div><div class="flabel">Balance owed</div>
             <div class="awrap"><span class="ds">$</span>
             <input type="number" value="${l.balance||''}" placeholder="0" min="0" inputmode="decimal"
               oninput="D().loans[${i}].balance=parseFloat(this.value)||0;updLoan(${i})"></div>
@@ -636,7 +709,6 @@ function renderLoans(){
       </div>
     </div>`).join('');
 }
-
 function updLoan(i){
   const l=D().loans[i];
   const items=document.querySelectorAll('#loan-list .list-item');
@@ -649,12 +721,12 @@ function updLoan(i){
 function addLoan(){D().loans.push({name:'',monthly:0,balance:0});renderLoans();}
 function delLoan(i){D().loans.splice(i,1);renderLoans();}
 
-// ---- GOALS ----
+// GOALS
 function renderGoals(){
   const d=D();
   if(!d.goals.length){document.getElementById('goal-list').innerHTML='<div style="text-align:center;padding:1rem;color:var(--muted);font-size:13px">No goals yet.</div>';return;}
   document.getElementById('goal-list').innerHTML=d.goals.map((g,i)=>{
-    const p=g.target>0?Math.min(100,Math.round(n(g.saved)/n(g.target)*100)):0;
+    const p=g.target>0?Math.min(100,Math.round(nv(g.saved)/nv(g.target)*100)):0;
     return`<div class="list-item">
       <div class="item-view">
         <span class="item-name">${g.name||'Goal'}</span>
@@ -663,20 +735,17 @@ function renderGoals(){
       </div>
       <div class="pbar"><div class="pfill" style="width:${p}%"></div></div>
       <div class="item-edit">
-        <div style="margin-bottom:8px">
-          <div class="flabel">Goal name</div>
+        <div style="margin-bottom:8px"><div class="flabel">Goal name</div>
           <input class="finput" type="text" value="${g.name||''}" placeholder="Goal name"
             oninput="D().goals[${i}].name=this.value;updGoal(${i})">
         </div>
         <div class="edit-grid-2">
-          <div>
-            <div class="flabel">Target amount</div>
+          <div><div class="flabel">Target amount</div>
             <div class="awrap"><span class="ds">$</span>
             <input type="number" value="${g.target||''}" placeholder="0" min="0" inputmode="decimal"
               oninput="D().goals[${i}].target=parseFloat(this.value)||0;updGoal(${i})"></div>
           </div>
-          <div>
-            <div class="flabel">Saved so far</div>
+          <div><div class="flabel">Saved so far</div>
             <div class="awrap"><span class="ds">$</span>
             <input type="number" value="${g.saved||''}" placeholder="0" min="0" inputmode="decimal"
               oninput="D().goals[${i}].saved=parseFloat(this.value)||0;updGoal(${i})"></div>
@@ -687,12 +756,11 @@ function renderGoals(){
     </div>`;
   }).join('');
 }
-
 function updGoal(i){
   const g=D().goals[i];
   const items=document.querySelectorAll('#goal-list .list-item');
   if(items[i]){
-    const p=g.target>0?Math.min(100,Math.round(n(g.saved)/n(g.target)*100)):0;
+    const p=g.target>0?Math.min(100,Math.round(nv(g.saved)/nv(g.target)*100)):0;
     items[i].querySelector('.item-name').textContent=g.name||'Goal';
     items[i].querySelector('.item-val').textContent=f(g.saved||0)+' / '+f(g.target||0);
     items[i].querySelector('.item-sub').textContent=p+'%';
@@ -702,9 +770,8 @@ function updGoal(i){
 function addGoal(){D().goals.push({name:'',target:0,saved:0});renderGoals();}
 function delGoal(i){D().goals.splice(i,1);renderGoals();}
 
-function saveSection(sec){
-  persist();
-  renderMetrics();renderPie();renderBar();renderCCDash();renderLoanDash();
+function saveSection(){
+  persist();renderMetrics();renderPie();renderBar();renderCCDash();renderLoanDash();
   toast('Saved ✓');
 }
 
@@ -714,12 +781,9 @@ function go(name){
   document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id==='page-'+name));
 }
 
+window.f=f;window.D=D;
+
 if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));}
-
-// expose f globally for inline oninput
-window.f=f;
-window.D=D;
-
 init();
 </script>
 </body>
