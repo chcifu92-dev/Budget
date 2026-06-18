@@ -19,11 +19,13 @@
   --border:rgba(0,0,0,0.08);--border2:rgba(0,0,0,0.15);
   --text:#1c1c1e;--muted:#6c6c70;
   --green:#1D9E75;--red:#D85A30;--amber:#BA7517;
-  --accent:#5B4FE8;--header:#5B4FE8;
+  --accent:#5B4FE8;
 }
 @media(prefers-color-scheme:dark){
-  :root{--bg:#1c1c1e;--surface:#2c2c2e;--surface2:#3a3a3c;--border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.15);--text:#fff;--muted:#98989f}
+  :root:not([data-theme="light"]){--bg:#1c1c1e;--surface:#2c2c2e;--surface2:#3a3a3c;--border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.15);--text:#fff;--muted:#98989f}
 }
+:root[data-theme="dark"]{--bg:#1c1c1e;--surface:#2c2c2e;--surface2:#3a3a3c;--border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.15);--text:#fff;--muted:#98989f}
+:root[data-theme="light"]{--bg:#f2f2f7;--surface:#fff;--surface2:#f2f2f7;--border:rgba(0,0,0,0.08);--border2:rgba(0,0,0,0.15);--text:#1c1c1e;--muted:#6c6c70}
 html,body{height:100%}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;overscroll-behavior:none}
 
@@ -39,14 +41,34 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .icon-btn{background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.3);border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#fff;font-size:16px}
 .icon-btn.pencil-on{background:#fff;color:var(--accent)}
 
-/* BALANCE CARD */
-.balance-card{background:rgba(255,255,255,0.15);border-radius:18px;padding:16px;margin:0 16px 16px}
-.balance-label{color:rgba(255,255,255,0.7);font-size:11px;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px}
-.balance-amount{color:#fff;font-size:34px;font-weight:600;letter-spacing:-1px;margin-bottom:14px}
-.balance-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.balance-mini{background:rgba(255,255,255,0.12);border-radius:12px;padding:10px 12px}
-.bm-label{color:rgba(255,255,255,0.6);font-size:10px;text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px}
-.bm-val{color:#fff;font-size:16px;font-weight:600}
+/* SPENDING RING */
+.ring-card{background:rgba(255,255,255,0.15);border-radius:18px;padding:14px 16px 16px;margin:0 16px 16px;display:flex;align-items:center;gap:14px}
+.ring-wrap{position:relative;width:90px;height:90px;flex-shrink:0}
+.ring-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.ring-pct{color:#fff;font-size:18px;font-weight:700;line-height:1}
+.ring-label{color:rgba(255,255,255,0.6);font-size:9px;text-transform:uppercase;letter-spacing:.04em;margin-top:2px}
+.ring-info{flex:1;min-width:0}
+
+/* CALENDAR */
+.cal-card{background:var(--surface);border-radius:14px;border:0.5px solid var(--border);padding:12px;margin-bottom:10px}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:1px;text-align:center}
+.cal-hdr{font-size:10px;color:var(--muted);font-weight:500;padding:3px 0}
+.cal-day{font-size:11px;padding:5px 2px;border-radius:7px;position:relative;color:var(--text)}
+.cal-day.today{background:var(--accent);color:#fff;font-weight:600}
+.cal-day.muted{color:var(--muted);opacity:.5}
+.cal-day.has-bill::after{content:'';position:absolute;bottom:1px;left:50%;transform:translateX(-50%);width:4px;height:4px;border-radius:50%;background:var(--red)}
+.cal-day.today.has-bill::after{background:rgba(255,255,255,0.8)}
+.cal-legend{display:flex;align-items:center;gap:5px;margin-top:8px;font-size:11px;color:var(--muted)}
+
+/* TRENDS */
+.trend{font-size:10px;font-weight:600;padding:2px 6px;border-radius:5px;margin-left:4px;white-space:nowrap}
+.trend-up{background:#FCEBEB;color:#A32D2D}
+.trend-dn{background:#E1F5EE;color:#0F6E56}
+.trend-eq{background:var(--surface2);color:var(--muted)}
+
+/* CONFETTI */
+.confetti-piece{position:absolute;width:7px;height:7px;border-radius:1px;opacity:0;pointer-events:none;animation:cfall 1.8s ease-in forwards}
+@keyframes cfall{0%{transform:translateY(-20px) rotate(0deg);opacity:1}100%{transform:translateY(120px) rotate(540deg);opacity:0}}
 
 /* EDIT BAR */
 .edit-bar{display:none;background:#fffbea;border-bottom:2px solid #f5c842;padding:8px 16px;font-size:13px;color:#7a5500;text-align:center;font-weight:500}
@@ -210,20 +232,32 @@ body.em .loan-row,.em .exp-row,.em .inc-row,.em .cc-row,.em .goal-row{outline:no
           <i class="ti ti-chevron-down" style="font-size:11px" aria-hidden="true"></i>
         </div>
         <button class="icon-btn" onclick="showNewMonth()" aria-label="New month"><i class="ti ti-plus" aria-hidden="true"></i></button>
+        <button class="icon-btn" id="themeBtn" onclick="toggleTheme()" aria-label="Toggle dark mode"><i class="ti ti-moon" aria-hidden="true"></i></button>
         <button class="icon-btn" id="pencilBtn" onclick="toggleEdit()" aria-label="Edit mode"><i class="ti ti-pencil" aria-hidden="true"></i></button>
       </div>
     </div>
-    <div class="balance-card">
-      <div class="balance-label">Left over this month</div>
-      <div class="balance-amount" id="hd-leftover">$0</div>
-      <div class="balance-grid">
-        <div class="balance-mini">
-          <div class="bm-label">Income</div>
-          <div class="bm-val" id="hd-income">$0</div>
+    <div class="ring-card">
+      <div class="ring-wrap">
+        <canvas id="ringCanvas" width="90" height="90"></canvas>
+        <div class="ring-center">
+          <div class="ring-pct" id="ringPct">0%</div>
+          <div class="ring-label">spent</div>
         </div>
-        <div class="balance-mini">
-          <div class="bm-label">Still to pay</div>
-          <div class="bm-val" id="hd-stilltopay">$0</div>
+      </div>
+      <div class="ring-info">
+        <div class="ri-row">
+          <div class="bm-label">Left over</div>
+          <div class="balance-amount" id="hd-leftover" style="font-size:26px;margin-bottom:10px">$0</div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div class="balance-mini">
+            <div class="bm-label">Income</div>
+            <div class="bm-val" id="hd-income">$0</div>
+          </div>
+          <div class="balance-mini">
+            <div class="bm-label">Still to pay</div>
+            <div class="bm-val" id="hd-stilltopay">$0</div>
+          </div>
         </div>
       </div>
     </div>
@@ -246,6 +280,12 @@ body.em .loan-row,.em .exp-row,.em .inc-row,.em .cc-row,.em .goal-row{outline:no
         <div class="qlabel">Goals saved</div>
         <div class="qval" id="d-goals" style="color:#0F6E56">$0</div>
       </div>
+    </div>
+
+    <div class="stitle">Bill calendar</div>
+    <div class="cal-card">
+      <div class="cal-grid" id="cal-grid"></div>
+      <div class="cal-legend"><span style="width:6px;height:6px;border-radius:50%;background:var(--red);display:inline-block"></span>Bill due</div>
     </div>
 
     <div class="stitle">Spending breakdown</div>
@@ -389,16 +429,16 @@ const DS=()=>({
     {label:'BAH',amount:0}
   ],
   expenses:[
-    {name:'House Payment',type:'Fixed',amount:2200,paid:false},
-    {name:'Car Payment',type:'Fixed',amount:565.48,paid:false},
-    {name:'Invisalign',type:'Fixed',amount:131.50,paid:false},
-    {name:'FEDVIP',type:'Fixed',amount:86.97,paid:false},
-    {name:'TRICARE',type:'Fixed',amount:63,paid:false},
-    {name:'VGLI',type:'Fixed',amount:40,paid:false},
-    {name:'iCloud',type:'Subscription',amount:9.99,paid:false},
-    {name:'HP',type:'Subscription',amount:9.73,paid:false},
-    {name:'YouTube',type:'Subscription',amount:15.69,paid:false},
-    {name:'Grocery',type:'Fixed',amount:400,paid:false},
+    {name:'House Payment',type:'Fixed',amount:2200,paid:false,dueDay:1},
+    {name:'Car Payment',type:'Fixed',amount:565.48,paid:false,dueDay:1},
+    {name:'Invisalign',type:'Fixed',amount:131.50,paid:false,dueDay:1},
+    {name:'FEDVIP',type:'Fixed',amount:86.97,paid:false,dueDay:8},
+    {name:'TRICARE',type:'Fixed',amount:63,paid:false,dueDay:1},
+    {name:'VGLI',type:'Fixed',amount:40,paid:false,dueDay:25},
+    {name:'iCloud',type:'Subscription',amount:9.99,paid:false,dueDay:0},
+    {name:'HP',type:'Subscription',amount:9.73,paid:false,dueDay:0},
+    {name:'YouTube',type:'Subscription',amount:15.69,paid:false,dueDay:0},
+    {name:'Grocery',type:'Fixed',amount:400,paid:false,dueDay:0},
   ],
   creditCards:[
     {name:'USAA',balance:6300,limit:10000},
@@ -464,8 +504,7 @@ function init(){
 
 function setGreeting(){
   const h=new Date().getHours();
-  
-  document.getElementById('greeting').textContent=(h<12?'Good morning ☀️':h<17?'Good afternoon 👋':'Good evening 🌙');
+  document.getElementById('greeting').textContent=h<12?'Good morning ☀️':h<17?'Good afternoon 👋':'Good evening 🌙';
 }
 
 function persist(){localStorage.setItem('bgt_v5',JSON.stringify(data));}
@@ -551,15 +590,18 @@ function paidAmt(){return D().expenses.filter(e=>e.paid).reduce((s,e)=>s+nv(e.am
 
 function renderAll(){
   updateHeader();
-  renderMetrics();renderPie();renderBar();renderCCDash();renderLoanDash();
+  renderMetrics();renderPie();renderBar();renderCCDash();renderLoanDash();renderCalendar();
   renderInc();renderExp();renderExpTotals();renderCC();renderLoans();renderLoanTotals();renderGoals();
+  checkGoalConfetti();
 }
 
 function updateHeader(){
   const inc=tInc(),rem=tRem(),still=unpaidExp()+unpaidLoans();
-  document.getElementById('hd-leftover').textContent=f(rem);
-  document.getElementById('hd-income').textContent=f(inc);
-  document.getElementById('hd-stilltopay').textContent=f(still);
+  animateVal(document.getElementById('hd-leftover'),rem);
+  animateVal(document.getElementById('hd-income'),inc);
+  animateVal(document.getElementById('hd-stilltopay'),still);
+  const spentPct=inc>0?Math.round((tExp()+tLoan())/inc*100):0;
+  animRing(spentPct);
 }
 
 function renderMetrics(){
@@ -695,10 +737,16 @@ function renderExp(){
           </select>
         </div>
       </div>
-      <div style="margin-bottom:8px"><div class="flabel">Amount</div>
-        <div class="awrap"><span class="ds">$</span>
-        <input type="number" value="${e.amount||''}" placeholder="0" min="0" inputmode="decimal"
-          oninput="D().expenses[${i}].amount=parseFloat(this.value)||0;renderExpTotals();updateHeader()"></div>
+      <div class="edit-grid-2" style="margin-bottom:8px">
+        <div><div class="flabel">Amount</div>
+          <div class="awrap"><span class="ds">$</span>
+          <input type="number" value="${e.amount||''}" placeholder="0" min="0" inputmode="decimal"
+            oninput="D().expenses[${i}].amount=parseFloat(this.value)||0;renderExpTotals();updateHeader()"></div>
+        </div>
+        <div><div class="flabel">Due day (1-31, 0=none)</div>
+          <input class="finput" type="number" value="${e.dueDay||0}" min="0" max="31" inputmode="numeric"
+            oninput="D().expenses[${i}].dueDay=parseInt(this.value)||0;renderCalendar()">
+        </div>
       </div>
       <button class="del-btn" onclick="delExp(${i})"><i class="ti ti-trash" aria-hidden="true"></i> Remove</button>
     </div>`;
@@ -918,7 +966,129 @@ function renderGoals(){
 function addGoal(){D().goals.push({name:'',target:0,saved:0,monthly:0});renderGoals();}
 function delGoal(i){D().goals.splice(i,1);renderGoals();updateHeader();renderMetrics();}
 
-function saveSection(){persist();updateHeader();renderMetrics();renderPie();renderBar();renderCCDash();renderLoanDash();toast('Saved ✓');}
+// DARK MODE TOGGLE
+function toggleTheme(){
+  const root=document.documentElement;
+  const current=root.getAttribute('data-theme');
+  const isDark=current==='dark'||(current===null&&window.matchMedia('(prefers-color-scheme:dark)').matches);
+  const next=isDark?'light':'dark';
+  root.setAttribute('data-theme',next);
+  localStorage.setItem('budgetTheme',next);
+  const btn=document.getElementById('themeBtn');
+  btn.innerHTML=next==='dark'?'<i class="ti ti-sun" aria-hidden="true"></i>':'<i class="ti ti-moon" aria-hidden="true"></i>';
+}
+
+function initTheme(){
+  const saved=localStorage.getItem('budgetTheme');
+  if(saved){
+    document.documentElement.setAttribute('data-theme',saved);
+    const btn=document.getElementById('themeBtn');
+    if(btn)btn.innerHTML=saved==='dark'?'<i class="ti ti-sun" aria-hidden="true"></i>':'<i class="ti ti-moon" aria-hidden="true"></i>';
+  }
+}
+
+// ANIMATED COUNTER
+function animateVal(el,target,prefix='$',duration=900){
+  const start=Date.now();
+  const from=parseFloat((el.textContent||'0').replace(/[^0-9.-]/g,''))||0;
+  const tick=()=>{
+    const p=Math.min((Date.now()-start)/duration,1);
+    const ease=1-Math.pow(1-p,3);
+    const val=Math.round(from+(target-from)*ease);
+    el.textContent=(val<0?'-$':'$')+Math.abs(val).toLocaleString();
+    if(p<1)requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
+}
+
+// SPENDING RING
+let ringAnimFrame=null;
+function drawRing(pct){
+  const canvas=document.getElementById('ringCanvas');
+  if(!canvas)return;
+  const ctx=canvas.getContext('2d');
+  const cx=45,cy=45,r=36,lw=9;
+  ctx.clearRect(0,0,90,90);
+  ctx.beginPath();ctx.arc(cx,cy,r,-Math.PI/2,Math.PI*2-Math.PI/2);
+  ctx.strokeStyle='rgba(255,255,255,0.2)';ctx.lineWidth=lw;ctx.lineCap='round';ctx.stroke();
+  if(pct>0){
+    const end=-Math.PI/2+(Math.PI*2*(Math.min(pct,100)/100));
+    ctx.beginPath();ctx.arc(cx,cy,r,-Math.PI/2,end);
+    ctx.strokeStyle='#fff';ctx.lineWidth=lw;ctx.lineCap='round';ctx.stroke();
+  }
+}
+
+function animRing(target){
+  if(ringAnimFrame)cancelAnimationFrame(ringAnimFrame);
+  let cur=0;
+  const step=()=>{
+    cur=Math.min(cur+2,target);
+    drawRing(cur);
+    document.getElementById('ringPct').textContent=cur+'%';
+    if(cur<target)ringAnimFrame=requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
+}
+
+// CALENDAR
+function renderCalendar(){
+  const now=new Date();
+  const y=am.year,m=am.month;
+  const firstDay=new Date(y,m,1).getDay();
+  const daysInMonth=new Date(y,m+1,0).getDate();
+  const daysInPrev=new Date(y,m,0).getDate();
+  const today=(now.getFullYear()===y&&now.getMonth()===m)?now.getDate():-1;
+
+  const billDays=new Set();
+  (D().expenses||[]).forEach(e=>{if(e.dueDay&&e.dueDay>0)billDays.add(e.dueDay);});
+
+  const days=['S','M','T','W','T','F','S'];
+  let html=days.map(d=>`<div class="cal-hdr">${d}</div>`).join('');
+
+  for(let i=0;i<firstDay;i++){
+    const d=daysInPrev-firstDay+i+1;
+    html+=`<div class="cal-day muted">${d}</div>`;
+  }
+  for(let d=1;d<=daysInMonth;d++){
+    const isToday=d===today;
+    const hasBill=billDays.has(d);
+    html+=`<div class="cal-day ${isToday?'today':''} ${hasBill?'has-bill':''}">${d}</div>`;
+  }
+  const remaining=(7-(firstDay+daysInMonth)%7)%7;
+  for(let d=1;d<=remaining;d++){html+=`<div class="cal-day muted">${d}</div>`;}
+
+  document.getElementById('cal-grid').innerHTML=html;
+}
+
+// CONFETTI
+function launchConfetti(){
+  const colors=['#5B4FE8','#1D9E75','#D85A30','#BA7517','#D4537E','#185FA5'];
+  const wrap=document.querySelector('main');
+  if(!wrap)return;
+  const container=document.createElement('div');
+  container.style.cssText='position:fixed;inset:0;pointer-events:none;z-index:999;overflow:hidden';
+  document.body.appendChild(container);
+  for(let i=0;i<40;i++){
+    const p=document.createElement('div');
+    p.className='confetti-piece';
+    p.style.cssText=`left:${10+Math.random()*80}%;top:0;background:${colors[Math.floor(Math.random()*colors.length)]};animation-delay:${Math.random()*0.6}s;animation-duration:${1.2+Math.random()*0.8}s;border-radius:${Math.random()>0.5?'50%':'2px'};width:${5+Math.random()*6}px;height:${5+Math.random()*6}px`;
+    container.appendChild(p);
+  }
+  setTimeout(()=>container.remove(),3000);
+}
+
+function checkGoalConfetti(){
+  (D().goals||[]).forEach(g=>{
+    if(nv(g.target)>0&&nv(g.saved)>=nv(g.target)&&!g._celebrated){
+      g._celebrated=true;
+      launchConfetti();
+      toast(`🎉 ${g.name} goal reached!`);
+    }
+    if(nv(g.saved)<nv(g.target))g._celebrated=false;
+  });
+}
+
+function saveSection(){persist();updateHeader();renderMetrics();renderPie();renderBar();renderCCDash();renderLoanDash();renderCalendar();checkGoalConfetti();toast('Saved ✓');}
 
 function go(name){
   const tabs=['dashboard','income','expenses','credit','loans','goals'];
@@ -927,12 +1097,13 @@ function go(name){
 }
 
 window.f=f;window.D=D;
-document.addEventListener('input',()=>persist());
+document.addEventListener('input',()=>{persist();checkGoalConfetti();});
 document.addEventListener('change',()=>persist());
 window.addEventListener('beforeunload',()=>persist());
 window.addEventListener('pagehide',()=>persist());
 window.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')persist();});
 if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));}
+initTheme();
 init();
 </script>
 </body>
