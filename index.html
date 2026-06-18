@@ -26,8 +26,8 @@
 }
 :root[data-theme="dark"]{--bg:#1c1c1e;--surface:#2c2c2e;--surface2:#3a3a3c;--border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.15);--text:#fff;--muted:#98989f}
 :root[data-theme="light"]{--bg:#f2f2f7;--surface:#fff;--surface2:#f2f2f7;--border:rgba(0,0,0,0.08);--border2:rgba(0,0,0,0.15);--text:#1c1c1e;--muted:#6c6c70}
-html,body{height:100%}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;overscroll-behavior:none}
+html,body{height:100%;overflow:hidden}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;overscroll-behavior:none;display:flex;flex-direction:column}
 
 /* HEADER */
 .top-header{background:var(--accent);padding:env(safe-area-inset-top) 0 0;position:sticky;top:0;z-index:20}
@@ -83,7 +83,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .nav-item.active span{color:var(--accent);font-weight:500}
 
 /* MAIN CONTENT */
-main{padding:12px 14px calc(80px + env(safe-area-inset-bottom));overflow-y:auto;height:calc(100vh - 200px)}
+main{padding:12px 14px calc(90px + env(safe-area-inset-bottom));overflow-y:auto;min-height:0;flex:1}
 .page{display:none}
 .page.active{display:block}
 
@@ -464,8 +464,8 @@ const DS=()=>({
     {name:'Capital One 3',balance:0,limit:600},
   ],
   loans:[
-    {name:'SPLASH',monthly:679,balance:5538,paid:false},
-    {name:'Affirm Ring',monthly:301,balance:4221,paid:false},
+    {name:'SPLASH',monthly:679,balance:5538,paid:false,dueDay:1},
+    {name:'Affirm Ring',monthly:301,balance:4221,paid:false,dueDay:1},
   ],
   goals:[
     {name:'Emergency Fund',target:10000,saved:0,monthly:0},
@@ -851,6 +851,10 @@ function renderLoans(){
             oninput="D().loans[${i}].balance=parseFloat(this.value)||0;renderLoanDash();renderMetrics()"></div>
         </div>
       </div>
+      <div style="margin-bottom:8px"><div class="flabel">Due day (1-31, 0=none)</div>
+        <input class="finput" type="number" value="${l.dueDay||0}" min="0" max="31" inputmode="numeric"
+          oninput="D().loans[${i}].dueDay=parseInt(this.value)||0;renderCalendar()">
+      </div>
       <button class="del-btn" onclick="delLoan(${i})"><i class="ti ti-trash" aria-hidden="true"></i> Remove</button>
     </div>`).join('');
   renderLoanTotals();
@@ -1037,10 +1041,12 @@ function renderCalendar(){
   const firstDay=new Date(y,m,1).getDay();
   const daysInMonth=new Date(y,m+1,0).getDate();
   const daysInPrev=new Date(y,m,0).getDate();
-  const today=(now.getFullYear()===y&&now.getMonth()===m)?now.getDate():-1;
+  const isCurrentMonth=(now.getFullYear()===y&&now.getMonth()===m);
+  const todayDate=isCurrentMonth?now.getDate():-1;
 
   const billDays=new Set();
-  (D().expenses||[]).forEach(e=>{if(e.dueDay&&e.dueDay>0)billDays.add(e.dueDay);});
+  (D().expenses||[]).forEach(e=>{if(e.dueDay&&e.dueDay>0)billDays.add(parseInt(e.dueDay));});
+  (D().loans||[]).forEach(l=>{if(l.dueDay&&l.dueDay>0)billDays.add(parseInt(l.dueDay));});
 
   const days=['S','M','T','W','T','F','S'];
   let html=days.map(d=>`<div class="cal-hdr">${d}</div>`).join('');
@@ -1050,12 +1056,12 @@ function renderCalendar(){
     html+=`<div class="cal-day muted">${d}</div>`;
   }
   for(let d=1;d<=daysInMonth;d++){
-    const isToday=d===today;
+    const isToday=d===todayDate;
     const hasBill=billDays.has(d);
     html+=`<div class="cal-day ${isToday?'today':''} ${hasBill?'has-bill':''}">${d}</div>`;
   }
   const remaining=(7-(firstDay+daysInMonth)%7)%7;
-  for(let d=1;d<=remaining;d++){html+=`<div class="cal-day muted">${d}</div>`;}
+  for(let d=1;d<=remaining&&remaining<7;d++){html+=`<div class="cal-day muted">${d}</div>`;}
 
   document.getElementById('cal-grid').innerHTML=html;
 }
