@@ -323,8 +323,8 @@ const DS=()=>({
     {name:'Affirm Ring',monthly:301,balance:4221,paid:false},
   ],
   goals:[
-    {name:'Emergency Fund',target:10000,saved:0},
-    {name:'Vacation',target:3000,saved:0},
+    {name:'Emergency Fund',target:10000,saved:0,monthly:0},
+    {name:'Vacation',target:3000,saved:0,monthly:0},
   ]
 });
 
@@ -404,6 +404,8 @@ function createMonth(){
   const k=document.getElementById('newMonthSel').value;if(!k){closeModals();return;}
   const prev=JSON.parse(JSON.stringify(D()));
   prev.expenses.forEach(e=>e.paid=false);
+  prev.loans.forEach(l=>l.paid=false);
+  prev.goals.forEach(g=>g.saved=0);
   data[k]=prev;persist();closeModals();
   cur=k;const p=k.replace('budget_','').split('_');am={year:+p[0],month:+p[1]};
   buildDrop();renderAll();toast(`${MN[am.month]} created ✓`);
@@ -435,8 +437,9 @@ function deleteMonth(){
 function tInc(){return D().income.reduce((s,i)=>s+nv(i.amount),0);}
 function tExp(){return D().expenses.reduce((s,e)=>s+nv(e.amount),0);}
 function tLoan(){return D().loans.reduce((s,l)=>s+nv(l.monthly),0);}
+function tGoals(){return D().goals.reduce((s,g)=>s+nv(g.saved),0);}
 function tDebt(){const d=D();return d.creditCards.reduce((s,c)=>s+nv(c.balance),0)+d.loans.reduce((s,l)=>s+nv(l.balance),0);}
-function tRem(){return tInc()-tExp()-tLoan();}
+function tRem(){return tInc()-tExp()-tLoan()-tGoals();}
 function tCCBal(){return D().creditCards.reduce((s,c)=>s+nv(c.balance),0);}
 function tCCLim(){return D().creditCards.reduce((s,c)=>s+nv(c.limit),0);}
 function paidCnt(){const e=D().expenses;return e.filter(x=>x.paid).length+'/'+e.length;}
@@ -814,13 +817,15 @@ function delLoan(i){D().loans.splice(i,1);renderLoans();}
 // GOALS
 function renderGoals(){
   const d=D();
+  // migrate existing goals without monthly
+  d.goals.forEach(g=>{if(g.monthly===undefined)g.monthly=0;});
   if(!d.goals.length){document.getElementById('goal-list').innerHTML='<div style="text-align:center;padding:1rem;color:var(--muted);font-size:13px">No goals yet.</div>';return;}
   document.getElementById('goal-list').innerHTML=d.goals.map((g,i)=>{
     const p=g.target>0?Math.min(100,Math.round(nv(g.saved)/nv(g.target)*100)):0;
     return`<div class="list-item">
       <div class="item-view">
         <span class="item-name">${g.name||'Goal'}</span>
-        <span class="item-sub">${p}%</span>
+        <span class="item-sub">${p}%${nv(g.monthly)>0?' · '+f(g.monthly)+'/mo':''}</span>
         <span class="item-val">${f(g.saved||0)} / ${f(g.target||0)}</span>
       </div>
       <div class="pbar"><div class="pfill" style="width:${p}%"></div></div>
@@ -829,7 +834,7 @@ function renderGoals(){
           <input class="finput" type="text" value="${g.name||''}" placeholder="Goal name"
             oninput="D().goals[${i}].name=this.value;updGoal(${i})">
         </div>
-        <div class="edit-grid-2">
+        <div class="edit-grid-2" style="margin-bottom:8px">
           <div><div class="flabel">Target amount</div>
             <div class="awrap"><span class="ds">$</span>
             <input type="number" value="${g.target||''}" placeholder="0" min="0" inputmode="decimal"
@@ -840,6 +845,12 @@ function renderGoals(){
             <input type="number" value="${g.saved||''}" placeholder="0" min="0" inputmode="decimal"
               oninput="D().goals[${i}].saved=parseFloat(this.value)||0;updGoal(${i})"></div>
           </div>
+        </div>
+        <div style="margin-bottom:8px">
+          <div class="flabel">Monthly contribution <span style="color:var(--accent);font-weight:600">(reduces left over)</span></div>
+          <div class="awrap"><span class="ds">$</span>
+          <input type="number" value="${g.monthly||''}" placeholder="0" min="0" inputmode="decimal"
+            oninput="D().goals[${i}].monthly=parseFloat(this.value)||0;updGoal(${i})"></div>
         </div>
         <button class="del-btn" onclick="delGoal(${i})">🗑 Remove goal</button>
       </div>
@@ -853,12 +864,13 @@ function updGoal(i){
     const p=g.target>0?Math.min(100,Math.round(nv(g.saved)/nv(g.target)*100)):0;
     items[i].querySelector('.item-name').textContent=g.name||'Goal';
     items[i].querySelector('.item-val').textContent=f(g.saved||0)+' / '+f(g.target||0);
-    items[i].querySelector('.item-sub').textContent=p+'%';
+    items[i].querySelector('.item-sub').textContent=p+'%'+(nv(g.monthly)>0?' · '+f(g.monthly)+'/mo':'');
     items[i].querySelector('.pfill').style.width=p+'%';
+    renderMetrics();
   }
 }
-function addGoal(){D().goals.push({name:'',target:0,saved:0});renderGoals();}
-function delGoal(i){D().goals.splice(i,1);renderGoals();}
+function addGoal(){D().goals.push({name:'',target:0,saved:0,monthly:0});renderGoals();}
+function delGoal(i){D().goals.splice(i,1);renderGoals();renderMetrics();}
 
 function saveSection(){
   persist();renderMetrics();renderPie();renderBar();renderCCDash();renderLoanDash();
