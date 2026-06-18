@@ -403,11 +403,22 @@ function showNewMonth(){
 function createMonth(){
   const k=document.getElementById('newMonthSel').value;if(!k){closeModals();return;}
   const prev=JSON.parse(JSON.stringify(D()));
+  // reset paid statuses
   prev.expenses.forEach(e=>e.paid=false);
   prev.loans.forEach(l=>l.paid=false);
-  // goals carry over with same saved amount
-  data[k]=prev;persist();closeModals();
-  cur=k;const p=k.replace('budget_','').split('_');am={year:+p[0],month:+p[1]};
+  // carry over goals with name, target, monthly AND saved amount
+  prev.goals=D().goals.map(g=>({
+    name:g.name,
+    target:g.target,
+    saved:g.saved,
+    monthly:g.monthly||0
+  }));
+  data[k]=prev;
+  persist();
+  closeModals();
+  cur=k;
+  const p=k.replace('budget_','').split('_');
+  am={year:+p[0],month:+p[1]};
   buildDrop();renderAll();toast(`${MN[am.month]} created ✓`);
 }
 
