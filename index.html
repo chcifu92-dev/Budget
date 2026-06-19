@@ -300,9 +300,6 @@ body.em .loan-row,.em .exp-row,.em .inc-row,.em .cc-row,.em .goal-row{outline:no
       </div>
     </div>
 
-    <div class="stitle">Upcoming bills</div>
-    <div class="card" id="upcoming-bills" style="padding:12px 14px"></div>
-
     <div class="stitle">Bill calendar</div>
     <div class="cal-card">
       <div class="cal-grid" id="cal-grid"></div>
@@ -615,7 +612,7 @@ function paidAmt(){return D().expenses.filter(e=>e.paid).reduce((s,e)=>s+nv(e.am
 
 function renderAll(){
   updateHeader();
-  renderMetrics();renderPie();renderBar();renderCCDash();renderLoanDash();renderCalendar();renderUpcomingBills();
+  renderMetrics();renderPie();renderBar();renderCCDash();renderLoanDash();renderCalendar();
   renderInc();renderExp();renderExpTotals();renderCC();renderLoans();renderLoanTotals();renderGoals();
   checkGoalConfetti();
 }
@@ -749,7 +746,7 @@ function renderInc(){
         <div><div class="flabel">Amount</div>
           <div class="awrap"><span class="ds">$</span>
           <input type="number" value="${inc.amount||''}" placeholder="0" min="0" inputmode="decimal"
-            oninput="D().income[${i}].amount=parseFloat(this.value)||0;renderInc();updateHeader()"></div>
+            onchange="D().income[${i}].amount=parseFloat(this.value)||0;updateHeader()"></div>
         </div>
       </div>
       <button class="del-btn" onclick="delInc(${i})"><i class="ti ti-trash" aria-hidden="true"></i> Remove</button>
@@ -792,7 +789,7 @@ function renderExp(){
         <div><div class="flabel">Amount</div>
           <div class="awrap"><span class="ds">$</span>
           <input type="number" value="${e.amount||''}" placeholder="0" min="0" inputmode="decimal"
-            oninput="D().expenses[${i}].amount=parseFloat(this.value)||0;renderExpTotals();updateHeader()"></div>
+            onchange="D().expenses[${i}].amount=parseFloat(this.value)||0;renderExpTotals();updateHeader()"></div>
         </div>
         <div><div class="flabel">Due day (1-31, 0=none)</div>
           <input class="finput" type="number" value="${e.dueDay||0}" min="0" max="31" inputmode="numeric"
@@ -854,12 +851,12 @@ function renderCC(){
         <div><div class="flabel">Balance</div>
           <div class="awrap"><span class="ds">$</span>
           <input type="number" value="${c.balance||''}" placeholder="0" min="0" inputmode="decimal"
-            oninput="D().creditCards[${i}].balance=parseFloat(this.value)||0;renderCC();renderCCDash();renderMetrics()"></div>
+            onchange="D().creditCards[${i}].balance=parseFloat(this.value)||0;renderCC();renderCCDash();renderMetrics()"></div>
         </div>
         <div><div class="flabel">Credit limit</div>
           <div class="awrap"><span class="ds">$</span>
           <input type="number" value="${c.limit||''}" placeholder="0" min="0" inputmode="decimal"
-            oninput="D().creditCards[${i}].limit=parseFloat(this.value)||0;renderCC();renderCCDash()"></div>
+            onchange="D().creditCards[${i}].limit=parseFloat(this.value)||0;renderCC();renderCCDash()"></div>
         </div>
       </div>
       <button class="del-btn" onclick="delCC(${i})"><i class="ti ti-trash" aria-hidden="true"></i> Remove</button>
@@ -895,12 +892,12 @@ function renderLoans(){
         <div><div class="flabel">Monthly payment</div>
           <div class="awrap"><span class="ds">$</span>
           <input type="number" value="${l.monthly||''}" placeholder="0" min="0" inputmode="decimal"
-            oninput="D().loans[${i}].monthly=parseFloat(this.value)||0;renderLoanTotals();updateHeader()"></div>
+            onchange="D().loans[${i}].monthly=parseFloat(this.value)||0;renderLoanTotals();updateHeader()"></div>
         </div>
         <div><div class="flabel">Balance owed</div>
           <div class="awrap"><span class="ds">$</span>
           <input type="number" value="${l.balance||''}" placeholder="0" min="0" inputmode="decimal"
-            oninput="D().loans[${i}].balance=parseFloat(this.value)||0;renderLoanDash();renderMetrics()"></div>
+            onchange="D().loans[${i}].balance=parseFloat(this.value)||0;renderLoanDash();renderMetrics()"></div>
         </div>
       </div>
       <div style="margin-bottom:8px"><div class="flabel">Due day (1-31, 0=none)</div>
@@ -1008,12 +1005,12 @@ function renderGoals(){
         <div><div class="flabel">Target amount</div>
           <div class="awrap"><span class="ds">$</span>
           <input type="number" value="${g.target||''}" placeholder="0" min="0" inputmode="decimal"
-            oninput="D().goals[${i}].target=parseFloat(this.value)||0;renderGoals()"></div>
+            onchange="D().goals[${i}].target=parseFloat(this.value)||0;renderGoals()"></div>
         </div>
         <div><div class="flabel">Saved so far</div>
           <div class="awrap"><span class="ds">$</span>
           <input type="number" value="${g.saved||''}" placeholder="0" min="0" inputmode="decimal"
-            oninput="D().goals[${i}].saved=parseFloat(this.value)||0;renderGoals();updateHeader();renderMetrics()"></div>
+            onchange="D().goals[${i}].saved=parseFloat(this.value)||0;renderGoals();updateHeader();renderMetrics()"></div>
         </div>
       </div>
       <button class="del-btn" onclick="delGoal(${i})"><i class="ti ti-trash" aria-hidden="true"></i> Remove</button>
