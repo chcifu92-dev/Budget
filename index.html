@@ -439,7 +439,7 @@ const CAT_COLORS={'Fixed':'#1D9E75','Subscription':'#D85A30','Variable':'#185FA5
 const MN=['January','February','March','April','May','June','July','August','September','October','November','December'];
 const EXP_COLORS=['#EEEDFE','#E6F1FB','#EAF3DE','#FAEEDA','#FAECE7','#E1F5EE','#FBEAF0','#FCEBEB'];
 const EXP_ICON_COLORS=['#534AB7','#185FA5','#3B6D11','#854F0B','#993C1D','#0F6E56','#993556','#A32D2D'];
-const EXP_ICONS={'House Payment':'ti-home','Rent':'ti-home','Car Payment':'ti-car','Grocery':'ti-shopping-cart','iCloud':'ti-cloud','HP':'ti-printer','YouTube':'ti-brand-youtube','Netflix':'ti-brand-netflix','FEDVIP':'ti-shield','TRICARE':'ti-shield-heart','VGLI':'ti-shield-check','Invisalign':'ti-tooth','Insurance':'ti-shield'};
+const EXP_ICONS={'House Payment':'ti-home','Rent':'ti-home','Car Payment':'ti-car','Grocery':'ti-shopping-cart','iCloud':'ti-cloud','HP':'ti-printer','YouTube':'ti-brand-youtube','Netflix':'ti-brand-netflix','FEDVIP':'ti-shield','TRICARE':'ti-shield-heart','VGLI':'ti-shield-check','Invisalign':'ti-tooth','Dental':'ti-tooth','Braces':'ti-tooth','Insurance':'ti-shield','ROTH':'ti-chart-line','IRA':'ti-chart-line','Savings':'ti-piggy-bank'};
 function getExpIcon(name){for(const k in EXP_ICONS)if(name.toLowerCase().includes(k.toLowerCase()))return EXP_ICONS[k];return 'ti-receipt';}
 function getExpColor(i){return{bg:EXP_COLORS[i%EXP_COLORS.length],ic:EXP_ICON_COLORS[i%EXP_ICON_COLORS.length]};}
 
@@ -461,6 +461,7 @@ const DS=()=>({
     {name:'HP',type:'Subscription',amount:9.73,paid:false,dueDay:0},
     {name:'YouTube',type:'Subscription',amount:15.69,paid:false,dueDay:0},
     {name:'Grocery',type:'Fixed',amount:400,paid:false,dueDay:0},
+    {name:'ROTH IRA',type:'Fixed',amount:625,paid:false,dueDay:1},
   ],
   creditCards:[
     {name:'USAA',balance:6300,limit:10000},
