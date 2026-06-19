@@ -875,7 +875,7 @@ function renderLoans(){
       <div class="eicon" style="background:#EEEDFE"><i class="ti ti-building-bank" style="color:#534AB7" aria-hidden="true"></i></div>
       <div style="flex:1;min-width:0">
         <div class="loan-name">${l.name||'Loan'}</div>
-        <div class="loan-mo">${f(l.monthly)}/mo</div>
+        <div class="loan-mo">${f(l.monthly)}/mo${l.dueDay?` · Due ${l.dueDay}${l.dueDay===1?'st':l.dueDay===2?'nd':l.dueDay===3?'rd':'th'}`:''}</div>
       </div>
       <div class="loan-right">
         <div class="loan-bal">${f(l.balance)}</div>
@@ -939,18 +939,50 @@ function toggleLoanPaid(i,v){
 function addLoan(){D().loans.push({name:'',monthly:0,balance:0,paid:false});renderLoans();}
 function delLoan(i){D().loans.splice(i,1);renderLoans();renderLoanDash();renderMetrics();}
 
-// Goal icon mapping
-function getGoalIcon(name){
-  const n=(name||'').toLowerCase();
-  if(n.includes('emergency')||n.includes('fund'))return{icon:'ti-first-aid-kit',bg:'#FCEBEB',ic:'#A32D2D'};
-  if(n.includes('vacation')||n.includes('trip')||n.includes('travel')||n.includes('beach'))return{icon:'ti-beach',bg:'#E6F1FB',ic:'#185FA5'};
-  if(n.includes('car')||n.includes('vehicle')||n.includes('auto'))return{icon:'ti-car',bg:'#EAF3DE',ic:'#3B6D11'};
-  if(n.includes('house')||n.includes('home')||n.includes('rent'))return{icon:'ti-home',bg:'#EEEDFE',ic:'#534AB7'};
-  if(n.includes('college')||n.includes('school')||n.includes('education'))return{icon:'ti-school',bg:'#FAEEDA',ic:'#854F0B'};
-  if(n.includes('wedding')||n.includes('ring'))return{icon:'ti-ring',bg:'#FBEAF0',ic:'#993556'};
-  if(n.includes('retire')||n.includes('401'))return{icon:'ti-chart-line',bg:'#E1F5EE',ic:'#0F6E56'};
-  if(n.includes('baby')||n.includes('kid')||n.includes('child'))return{icon:'ti-baby-carriage',bg:'#FBEAF0',ic:'#993556'};
-  return{icon:'ti-piggy-bank',bg:'#EEEDFE',ic:'#534AB7'};
+// Goal icon options for dropdown
+const GOAL_ICONS=[
+  {icon:'ti-first-aid-kit', bg:'#FCEBEB', ic:'#A32D2D', label:'🚑 Emergency'},
+  {icon:'ti-beach',         bg:'#E6F1FB', ic:'#185FA5', label:'🏖 Vacation'},
+  {icon:'ti-home',          bg:'#EEEDFE', ic:'#534AB7', label:'🏠 Home'},
+  {icon:'ti-car',           bg:'#EAF3DE', ic:'#3B6D11', label:'🚗 Car'},
+  {icon:'ti-school',        bg:'#FAEEDA', ic:'#854F0B', label:'🎓 Education'},
+  {icon:'ti-ring',          bg:'#FBEAF0', ic:'#993556', label:'💍 Wedding'},
+  {icon:'ti-chart-line',    bg:'#E1F5EE', ic:'#0F6E56', label:'📈 Retirement'},
+  {icon:'ti-baby-carriage', bg:'#FBEAF0', ic:'#993556', label:'👶 Baby'},
+  {icon:'ti-plane',         bg:'#E6F1FB', ic:'#185FA5', label:'✈️ Travel'},
+  {icon:'ti-device-laptop', bg:'#EEEDFE', ic:'#534AB7', label:'💻 Tech'},
+  {icon:'ti-barbell',       bg:'#EAF3DE', ic:'#3B6D11', label:'🏋️ Fitness'},
+  {icon:'ti-cash',          bg:'#E1F5EE', ic:'#0F6E56', label:'💵 Cash'},
+  {icon:'ti-coin',          bg:'#FAEEDA', ic:'#854F0B', label:'🪙 Savings'},
+  {icon:'ti-piggy-bank',    bg:'#EEEDFE', ic:'#534AB7', label:'🐷 Piggy bank'},
+  {icon:'ti-heart',         bg:'#FBEAF0', ic:'#993556', label:'❤️ Health'},
+  {icon:'ti-gift',          bg:'#FCEBEB', ic:'#A32D2D', label:'🎁 Gift'},
+  {icon:'ti-building',      bg:'#EEEDFE', ic:'#534AB7', label:'🏢 Business'},
+  {icon:'ti-tools',         bg:'#FAEEDA', ic:'#854F0B', label:'🔧 Repairs'},
+  {icon:'ti-device-mobile', bg:'#EAF3DE', ic:'#3B6D11', label:'📱 Phone'},
+  {icon:'ti-music',         bg:'#FBEAF0', ic:'#993556', label:'🎵 Music'},
+  {icon:'ti-trophy',        bg:'#FAEEDA', ic:'#854F0B', label:'🏆 Goal'},
+  {icon:'ti-star',          bg:'#FAEEDA', ic:'#854F0B', label:'⭐ Dream'},
+];
+
+function getGoalIcon(g){
+  // If manual icon set, use it
+  if(g.iconIndex!==undefined&&GOAL_ICONS[g.iconIndex]) return GOAL_ICONS[g.iconIndex];
+  // Otherwise auto-detect by name
+  const n=(g.name||g||'').toLowerCase();
+  if(n.includes('emergency')||n.includes('fund'))return GOAL_ICONS[0];
+  if(n.includes('vacation')||n.includes('trip')||n.includes('beach'))return GOAL_ICONS[1];
+  if(n.includes('house')||n.includes('home')||n.includes('rent'))return GOAL_ICONS[2];
+  if(n.includes('car')||n.includes('vehicle')||n.includes('auto'))return GOAL_ICONS[3];
+  if(n.includes('college')||n.includes('school')||n.includes('education'))return GOAL_ICONS[4];
+  if(n.includes('wedding')||n.includes('ring'))return GOAL_ICONS[5];
+  if(n.includes('retire')||n.includes('401')||n.includes('roth')||n.includes('ira'))return GOAL_ICONS[6];
+  if(n.includes('baby')||n.includes('kid')||n.includes('child'))return GOAL_ICONS[7];
+  if(n.includes('travel')||n.includes('flight')||n.includes('plane'))return GOAL_ICONS[8];
+  if(n.includes('tech')||n.includes('laptop')||n.includes('computer'))return GOAL_ICONS[9];
+  if(n.includes('cash'))return GOAL_ICONS[11];
+  if(n.includes('saving'))return GOAL_ICONS[12];
+  return GOAL_ICONS[13]; // default piggy bank
 }
 
 // CC colored initial badge
@@ -981,9 +1013,11 @@ function renderGoals(){
   const d=D();
   d.goals.forEach(g=>{if(g.monthly===undefined)g.monthly=0;});
   if(!d.goals.length){document.getElementById('goal-list').innerHTML='<div style="text-align:center;padding:1.5rem;color:var(--muted);font-size:14px">No goals yet. Add one below!</div>';return;}
+  const iconDropdown=GOAL_ICONS.map((ic,idx)=>`<option value="${idx}">${ic.label}</option>`).join('');
   document.getElementById('goal-list').innerHTML=d.goals.map((g,i)=>{
     const p=g.target>0?Math.min(100,Math.round(nv(g.saved)/nv(g.target)*100)):0;
-    const gi=getGoalIcon(g.name);
+    const gi=getGoalIcon(g);
+    const selIdx=g.iconIndex!==undefined?g.iconIndex:'';
     return`<div class="goal-row">
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
         <div class="eicon" style="background:${gi.bg};flex-shrink:0"><i class="ti ${gi.icon}" style="color:${gi.ic}" aria-hidden="true"></i></div>
@@ -998,9 +1032,17 @@ function renderGoals(){
       <div class="pbar"><div class="pfill" style="width:${p}%;background:${gi.ic}"></div></div>
     </div>
     <div class="edit-section">
-      <div style="margin-bottom:8px"><div class="flabel">Goal name</div>
-        <input class="finput" type="text" value="${g.name||''}" placeholder="Goal name"
-          onchange="D().goals[${i}].name=this.value;renderGoals()">
+      <div class="edit-grid-2" style="margin-bottom:8px">
+        <div><div class="flabel">Goal name</div>
+          <input class="finput" type="text" value="${g.name||''}" placeholder="Goal name"
+            onchange="D().goals[${i}].name=this.value;renderGoals()">
+        </div>
+        <div><div class="flabel">Icon</div>
+          <select class="finput" onchange="D().goals[${i}].iconIndex=parseInt(this.value);renderGoals()">
+            <option value="" ${selIdx===''?'selected':''}>Auto detect</option>
+            ${GOAL_ICONS.map((ic,idx)=>`<option value="${idx}" ${selIdx===idx?'selected':''}>${ic.label}</option>`).join('')}
+          </select>
+        </div>
       </div>
       <div class="edit-grid-2" style="margin-bottom:8px">
         <div><div class="flabel">Target amount</div>
