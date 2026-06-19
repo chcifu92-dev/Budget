@@ -1016,57 +1016,83 @@ function getCCIcon(name){
 // GOALS
 function renderGoals(){
   const d=D();
-  d.goals.forEach(g=>{if(g.monthly===undefined)g.monthly=0;});
-  if(!d.goals.length){document.getElementById('goal-list').innerHTML='<div style="text-align:center;padding:1.5rem;color:var(--muted);font-size:14px">No goals yet. Add one below!</div>';return;}
-  const iconDropdown=GOAL_ICONS.map((ic,idx)=>`<option value="${idx}">${ic.label}</option>`).join('');
-  document.getElementById('goal-list').innerHTML=d.goals.map((g,i)=>{
+  if(!d.goals)d.goals=[];
+  d.goals.forEach(g=>{
+    if(g.monthly===undefined)g.monthly=0;
+    if(g.iconIndex===undefined)g.iconIndex=null;
+  });
+  const el=document.getElementById('goal-list');
+  if(!el)return;
+  if(!d.goals.length){
+    el.innerHTML='<div style="text-align:center;padding:1.5rem;color:var(--muted);font-size:14px">No goals yet. Add one below!</div>';
+    return;
+  }
+  el.innerHTML=d.goals.map((g,i)=>{
     const p=g.target>0?Math.min(100,Math.round(nv(g.saved)/nv(g.target)*100)):0;
     const gi=getGoalIcon(g);
-    const selIdx=g.iconIndex!==undefined?g.iconIndex:'';
-    return`<div class="goal-row">
+    const selIdx=g.iconIndex!==null&&g.iconIndex!==undefined?parseInt(g.iconIndex):-1;
+    const iconOpts=['<option value="-1"'+(selIdx===-1?' selected':'')+'>Auto detect</option>',
+      ...GOAL_ICONS.map((ic,idx)=>`<option value="${idx}"${selIdx===idx?' selected':''}>${ic.label}</option>`)
+    ].join('');
+    return`<div class="list-item" style="margin-bottom:8px">
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
-        <div class="eicon" style="background:${gi.bg};flex-shrink:0"><i class="ti ${gi.icon}" style="color:${gi.ic}" aria-hidden="true"></i></div>
+        <div class="eicon" style="background:${gi.bg};flex-shrink:0">
+          <i class="ti ${gi.icon}" style="color:${gi.ic}" aria-hidden="true"></i>
+        </div>
         <div style="flex:1;min-width:0">
-          <div class="goal-header" style="margin-bottom:0">
-            <span class="goal-name">${g.name||'Goal'}</span>
-            <span class="goal-pct">${p}%</span>
+          <div style="display:flex;justify-content:space-between;align-items:baseline">
+            <span style="font-size:14px;font-weight:500;color:var(--text)">${g.name||'New Goal'}</span>
+            <span style="font-size:12px;color:var(--muted)">${p}%</span>
           </div>
-          <div class="goal-amounts" style="margin-top:0"><span>${f(g.saved||0)} saved</span><span>Target: ${f(g.target||0)}</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:1px">
+            <span>${f(g.saved||0)} saved</span>
+            <span>Target: ${f(g.target||0)}</span>
+          </div>
         </div>
       </div>
       <div class="pbar"><div class="pfill" style="width:${p}%;background:${gi.ic}"></div></div>
-    </div>
-    <div class="edit-section">
-      <div class="edit-grid-2" style="margin-bottom:8px">
-        <div><div class="flabel">Goal name</div>
-          <input class="finput" type="text" value="${g.name||''}" placeholder="Goal name"
-            onchange="D().goals[${i}].name=this.value;renderGoals()">
+      <div class="item-edit">
+        <div class="edit-grid-2" style="margin-bottom:8px;margin-top:10px">
+          <div><div class="flabel">Goal name</div>
+            <input class="finput" type="text" value="${(g.name||'').replace(/"/g,'&quot;')}" placeholder="Goal name"
+              onchange="D().goals[${i}].name=this.value;persist();renderGoals()">
+          </div>
+          <div><div class="flabel">Icon</div>
+            <select class="finput" onchange="var v=parseInt(this.value);D().goals[${i}].iconIndex=isNaN(v)||v===-1?null:v;persist();renderGoals()">
+              ${iconOpts}
+            </select>
+          </div>
         </div>
-        <div><div class="flabel">Icon</div>
-          <select class="finput" onchange="D().goals[${i}].iconIndex=parseInt(this.value);renderGoals()">
-            <option value="" ${selIdx===''?'selected':''}>Auto detect</option>
-            ${GOAL_ICONS.map((ic,idx)=>`<option value="${idx}" ${selIdx===idx?'selected':''}>${ic.label}</option>`).join('')}
-          </select>
+        <div class="edit-grid-2" style="margin-bottom:8px">
+          <div><div class="flabel">Target amount</div>
+            <div class="awrap"><span class="ds">$</span>
+            <input type="number" value="${g.target||''}" placeholder="0" min="0" inputmode="decimal"
+              onchange="D().goals[${i}].target=parseFloat(this.value)||0;persist();renderGoals()"></div>
+          </div>
+          <div><div class="flabel">Saved so far</div>
+            <div class="awrap"><span class="ds">$</span>
+            <input type="number" value="${g.saved||''}" placeholder="0" min="0" inputmode="decimal"
+              onchange="D().goals[${i}].saved=parseFloat(this.value)||0;persist();renderGoals();updateHeader();renderMetrics()"></div>
+          </div>
         </div>
+        <button class="del-btn" onclick="delGoal(${i})"><i class="ti ti-trash" aria-hidden="true"></i> Remove</button>
       </div>
-      <div class="edit-grid-2" style="margin-bottom:8px">
-        <div><div class="flabel">Target amount</div>
-          <div class="awrap"><span class="ds">$</span>
-          <input type="number" value="${g.target||''}" placeholder="0" min="0" inputmode="decimal"
-            onchange="D().goals[${i}].target=parseFloat(this.value)||0;renderGoals()"></div>
-        </div>
-        <div><div class="flabel">Saved so far</div>
-          <div class="awrap"><span class="ds">$</span>
-          <input type="number" value="${g.saved||''}" placeholder="0" min="0" inputmode="decimal"
-            onchange="D().goals[${i}].saved=parseFloat(this.value)||0;renderGoals();updateHeader();renderMetrics()"></div>
-        </div>
-      </div>
-      <button class="del-btn" onclick="delGoal(${i})"><i class="ti ti-trash" aria-hidden="true"></i> Remove</button>
     </div>`;
   }).join('');
 }
-function addGoal(){if(!D().goals)D().goals=[];D().goals.push({name:'',target:0,saved:0,monthly:0,iconIndex:undefined});renderGoals();}
-function delGoal(i){D().goals.splice(i,1);renderGoals();updateHeader();renderMetrics();}
+
+function addGoal(){
+  if(!D().goals)D().goals=[];
+  D().goals.push({name:'New Goal',target:0,saved:0,monthly:0,iconIndex:null});
+  persist();
+  renderGoals();
+  // scroll to bottom of goals list so user sees the new one
+  setTimeout(()=>{
+    const el=document.getElementById('goal-list');
+    if(el)el.lastElementChild?.scrollIntoView({behavior:'smooth',block:'nearest'});
+  },100);
+}
+function delGoal(i){D().goals.splice(i,1);persist();renderGoals();updateHeader();renderMetrics();}
 
 // DARK MODE TOGGLE
 function toggleTheme(){
@@ -1350,12 +1376,23 @@ function checkGoalConfetti(){
   });
 }
 
-function saveSection(){persist();updateHeader();renderMetrics();renderPie();renderBar();renderCCDash();renderLoanDash();renderCalendar();checkGoalConfetti();toast('Saved ✓');}
+function saveSection(){
+  persist();
+  updateHeader();renderMetrics();renderPie();renderBar();renderCCDash();renderLoanDash();renderCalendar();checkGoalConfetti();
+  toast('Saved ✓');
+}
 
 function go(name){
   const tabs=['dashboard','income','expenses','credit','loans','goals'];
   document.querySelectorAll('.nav-item').forEach((b,i)=>b.classList.toggle('active',tabs[i]===name));
   document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id==='page-'+name));
+  // Always re-render the page we switch to so data is fresh
+  if(name==='dashboard'){updateHeader();renderMetrics();renderPie();renderBar();renderCCDash();renderLoanDash();renderCalendar();}
+  if(name==='income')renderInc();
+  if(name==='expenses'){renderExp();renderExpTotals();}
+  if(name==='credit')renderCC();
+  if(name==='loans'){renderLoans();renderLoanTotals();}
+  if(name==='goals')renderGoals();
 }
 
 window.f=f;window.D=D;
