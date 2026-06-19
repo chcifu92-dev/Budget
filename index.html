@@ -741,7 +741,7 @@ function renderInc(){
     <div class="edit-section">
       <div class="edit-grid-2" style="margin-bottom:8px">
         <div><div class="flabel">Label</div>
-          <input class="finput" type="text" value="${inc.label}" oninput="D().income[${i}].label=this.value;renderInc()">
+          <input class="finput" type="text" value="${inc.label}" onchange="D().income[${i}].label=this.value;renderInc()">
         </div>
         <div><div class="flabel">Amount</div>
           <div class="awrap"><span class="ds">$</span>
@@ -775,10 +775,10 @@ function renderExp(){
       <div class="edit-grid-2" style="margin-bottom:8px">
         <div><div class="flabel">Name</div>
           <input class="finput" type="text" value="${e.name||''}" placeholder="Name"
-            oninput="D().expenses[${i}].name=this.value;renderExp()">
+            onchange="D().expenses[${i}].name=this.value;renderExp()">
         </div>
         <div><div class="flabel">Type</div>
-          <select class="finput" onchange="D().expenses[${i}].type=this.value;renderExp()">
+          <select class="finput" onchange="D().expenses[${i}].type=this.value">
             <option ${e.type==='Fixed'?'selected':''}>Fixed</option>
             <option ${e.type==='Subscription'?'selected':''}>Subscription</option>
             <option ${e.type==='Variable'?'selected':''}>Variable</option>
@@ -793,7 +793,7 @@ function renderExp(){
         </div>
         <div><div class="flabel">Due day (1-31, 0=none)</div>
           <input class="finput" type="number" value="${e.dueDay||0}" min="0" max="31" inputmode="numeric"
-            oninput="D().expenses[${i}].dueDay=parseInt(this.value)||0;renderCalendar()">
+            onchange="D().expenses[${i}].dueDay=parseInt(this.value)||0;renderCalendar()">
         </div>
       </div>
       <button class="del-btn" onclick="delExp(${i})"><i class="ti ti-trash" aria-hidden="true"></i> Remove</button>
@@ -845,7 +845,7 @@ function renderCC(){
     <div class="edit-section">
       <div style="margin-bottom:8px"><div class="flabel">Card name</div>
         <input class="finput" type="text" value="${c.name||''}" placeholder="Card name"
-          oninput="D().creditCards[${i}].name=this.value;renderCC();renderCCDash()">
+          onchange="D().creditCards[${i}].name=this.value;renderCC();renderCCDash()">
       </div>
       <div class="edit-grid-2" style="margin-bottom:8px">
         <div><div class="flabel">Balance</div>
@@ -886,7 +886,7 @@ function renderLoans(){
     <div class="edit-section">
       <div style="margin-bottom:8px"><div class="flabel">Loan name</div>
         <input class="finput" type="text" value="${l.name||''}" placeholder="Loan name"
-          oninput="D().loans[${i}].name=this.value;renderLoans()">
+          onchange="D().loans[${i}].name=this.value;renderLoans()">
       </div>
       <div class="edit-grid-2" style="margin-bottom:8px">
         <div><div class="flabel">Monthly payment</div>
@@ -902,7 +902,7 @@ function renderLoans(){
       </div>
       <div style="margin-bottom:8px"><div class="flabel">Due day (1-31, 0=none)</div>
         <input class="finput" type="number" value="${l.dueDay||0}" min="0" max="31" inputmode="numeric"
-          oninput="D().loans[${i}].dueDay=parseInt(this.value)||0;renderCalendar()">
+          onchange="D().loans[${i}].dueDay=parseInt(this.value)||0;renderCalendar()">
       </div>
       <button class="del-btn" onclick="delLoan(${i})"><i class="ti ti-trash" aria-hidden="true"></i> Remove</button>
     </div>`).join('');
@@ -999,7 +999,7 @@ function renderGoals(){
     <div class="edit-section">
       <div style="margin-bottom:8px"><div class="flabel">Goal name</div>
         <input class="finput" type="text" value="${g.name||''}" placeholder="Goal name"
-          oninput="D().goals[${i}].name=this.value;renderGoals()">
+          onchange="D().goals[${i}].name=this.value;renderGoals()">
       </div>
       <div class="edit-grid-2" style="margin-bottom:8px">
         <div><div class="flabel">Target amount</div>
