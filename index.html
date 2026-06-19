@@ -439,8 +439,12 @@ const CAT_COLORS={'Fixed':'#1D9E75','Subscription':'#D85A30','Variable':'#185FA5
 const MN=['January','February','March','April','May','June','July','August','September','October','November','December'];
 const EXP_COLORS=['#EEEDFE','#E6F1FB','#EAF3DE','#FAEEDA','#FAECE7','#E1F5EE','#FBEAF0','#FCEBEB'];
 const EXP_ICON_COLORS=['#534AB7','#185FA5','#3B6D11','#854F0B','#993C1D','#0F6E56','#993556','#A32D2D'];
-const EXP_ICONS={'House Payment':'ti-home','Rent':'ti-home','Car Payment':'ti-car','Grocery':'ti-shopping-cart','iCloud':'ti-cloud','HP':'ti-printer','YouTube':'ti-brand-youtube','Netflix':'ti-brand-netflix','FEDVIP':'ti-shield','TRICARE':'ti-shield-heart','VGLI':'ti-shield-check','Invisalign':'ti-tooth','Dental':'ti-tooth','Braces':'ti-tooth','Insurance':'ti-shield','ROTH':'ti-chart-line','IRA':'ti-chart-line','Savings':'ti-piggy-bank'};
-function getExpIcon(name){for(const k in EXP_ICONS)if(name.toLowerCase().includes(k.toLowerCase()))return EXP_ICONS[k];return 'ti-receipt';}
+const EXP_ICONS={'House Payment':'ti-home','Rent':'ti-home','Car Payment':'ti-car','Grocery':'ti-shopping-cart','iCloud':'ti-cloud','HP':'ti-printer','YouTube':'ti-brand-youtube','Netflix':'ti-brand-netflix','FEDVIP':'ti-shield','TRICARE':'ti-shield-heart','VGLI':'ti-shield-check','Invisalign':'ti-dental','Dental':'ti-dental','Braces':'ti-dental','Insurance':'ti-shield','ROTH':'ti-chart-line','IRA':'ti-chart-line','Savings':'ti-piggy-bank'};
+function getExpIcon(name){
+  if(!name)return'ti-receipt';
+  for(const k in EXP_ICONS)if(name.toLowerCase().includes(k.toLowerCase()))return EXP_ICONS[k];
+  return'ti-receipt';
+}
 function getExpColor(i){return{bg:EXP_COLORS[i%EXP_COLORS.length],ic:EXP_ICON_COLORS[i%EXP_ICON_COLORS.length]};}
 
 const DS=()=>({
@@ -765,7 +769,8 @@ function renderExp(){
       <div class="eicon" style="background:${c.bg}"><i class="ti ${getExpIcon(e.name)}" style="color:${c.ic}" aria-hidden="true"></i></div>
       <div class="einfo">
         <div class="exp-name">${e.name||'Expense'}</div>
-        <div class="exp-type-badge">${e.type}</div>
+        <div class="exp-type-badge">${e.type}${e.dueDay?` · Due ${e.dueDay}${e.dueDay==1?'st':e.dueDay==2?'nd':e.dueDay==3?'rd':'th'}`:''}
+        </div>
       </div>
       <div class="eamt">${f(e.amount,2)}</div>
       <button class="echk ${e.paid?'done':''}" onclick="togglePaid(${i},${!e.paid})" aria-label="Mark paid">
@@ -1060,7 +1065,7 @@ function renderGoals(){
     </div>`;
   }).join('');
 }
-function addGoal(){D().goals.push({name:'',target:0,saved:0,monthly:0});renderGoals();}
+function addGoal(){if(!D().goals)D().goals=[];D().goals.push({name:'',target:0,saved:0,monthly:0,iconIndex:undefined});renderGoals();}
 function delGoal(i){D().goals.splice(i,1);renderGoals();updateHeader();renderMetrics();}
 
 // DARK MODE TOGGLE
